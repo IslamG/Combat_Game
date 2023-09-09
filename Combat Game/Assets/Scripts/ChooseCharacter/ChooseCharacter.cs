@@ -6,29 +6,34 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(AudioSource))]
 public class ChooseCharacter : ChooseCharacterManager
 {
-    public Vector3 _spawnPosition = new Vector3();
+    public Vector3 _spawnPosition;// = new Vector3();
 
     public Texture2D _selectCharacterTextBackground;
     public Texture2D _selectCharacterTextForeground;
     public Texture2D _selectCharacterText;
 
-    public Texture2D _selectCharacterArrowLeft;
-    public Texture2D _selectCharacterArrowRight;
+    public Texture2D _selectCharacterArrowLeft; //Use seperate graphics for different input looks
+    public Texture2D _selectCharacterArrowRight;//PS vs XBox vs PC buttons
+    //public Texture2D _selectCharacterArrowLeft;
+    //public Texture2D _selectCharacterArrowRight;
 
     private float _foregroundTextWidth;
     private float _foregroundTextHeight;
     private float _arrowSize;
 
-    public float _chooseCharacterInputTimer;
-    public float _chooseCharacterInputDelay = 0.5f;
+    private float _chooseCharacterInputTimer;
+    private float _chooseCharacterInputDelay = 0.1f;
 
     public AudioClip _cycleCharacterButtonPress;
 
     private GameObject _characterDemo;
     public static bool _demoPlayer;
 
+    private GameObject _switchCharacterParticleSystem;
+    private int _pickRandomCharacter;
+
     public int _characterSelectSate;
-    public int _yRot = 90;
+    private int _yRot = 90;
 
     private enum CharacterSelectModels
     {
@@ -68,7 +73,10 @@ public class ChooseCharacter : ChooseCharacterManager
                 return;
 
             GetComponent<AudioSource>().PlayOneShot(_cycleCharacterButtonPress);
+
             _characterSelectSate--;
+            _switchCharacterParticleSystem = Instantiate(Resources.Load("SwitchCharParticles")) as GameObject;
+            _switchCharacterParticleSystem.transform.position = _spawnPosition;
             CharacterSelectManager();
 
             _chooseCharacterInputTimer = _chooseCharacterInputDelay;
@@ -80,10 +88,25 @@ public class ChooseCharacter : ChooseCharacterManager
 
             GetComponent<AudioSource>().PlayOneShot(_cycleCharacterButtonPress);
             _characterSelectSate++;
+            _switchCharacterParticleSystem = Instantiate(Resources.Load("SwitchCharParticles")) as GameObject;
+            _switchCharacterParticleSystem.transform.position = _spawnPosition;
             CharacterSelectManager();
 
             _chooseCharacterInputTimer = _chooseCharacterInputDelay;
 
+        }
+
+        if (Input.GetButtonDown("Select"))
+        {
+            _pickRandomCharacter = Random.Range(0, 3);
+            _characterSelectSate = _pickRandomCharacter;
+
+            GetComponent<AudioSource>().PlayOneShot(_cycleCharacterButtonPress);
+
+            _switchCharacterParticleSystem = Instantiate(Resources.Load("SwitchCharParticles")) as GameObject;
+            _switchCharacterParticleSystem.transform.position = _spawnPosition;
+
+            CharacterSelectManager();
         }
     }
 
@@ -102,9 +125,9 @@ public class ChooseCharacter : ChooseCharacterManager
     private void Char1() 
     {
         DestroyObject(_characterDemo);
-        _characterDemo = Instantiate(Resources.Load("Char1")) as GameObject;
+        _characterDemo = Instantiate(Resources.Load("Char1"), _spawnPosition, Quaternion.identity) as GameObject;
 
-        _characterDemo.transform.position = _spawnPosition;
+        //_characterDemo.transform.position = _spawnPosition;
         _characterDemo.transform.eulerAngles = new Vector3(0, _yRot, 0);
 
         _char1 = true;
@@ -115,9 +138,9 @@ public class ChooseCharacter : ChooseCharacterManager
     private void Char2()
     {
         DestroyObject(_characterDemo);
-        _characterDemo = Instantiate(Resources.Load("Char2")) as GameObject;
+        _characterDemo = Instantiate(Resources.Load("Char2"), _spawnPosition, Quaternion.identity) as GameObject;
 
-        _characterDemo.transform.position = _spawnPosition;
+        //_characterDemo.transform.position = _spawnPosition;
         _characterDemo.transform.eulerAngles = new Vector3(0, _yRot, 0);
 
         _char2 = true;
@@ -128,9 +151,9 @@ public class ChooseCharacter : ChooseCharacterManager
     private void Char3()
     {
         DestroyObject(_characterDemo);
-        _characterDemo = Instantiate(Resources.Load("Char3")) as GameObject;
+        _characterDemo = Instantiate(Resources.Load("Char3"), _spawnPosition, Quaternion.identity) as GameObject;
 
-        _characterDemo.transform.position = _spawnPosition;
+        //_characterDemo.transform.position = _spawnPosition;
         _characterDemo.transform.eulerAngles = new Vector3(0, _yRot, 0);
 
         _char3 = true;
@@ -141,9 +164,9 @@ public class ChooseCharacter : ChooseCharacterManager
     private void Char4()
     {
         DestroyObject(_characterDemo);
-        _characterDemo = Instantiate(Resources.Load("Char4")) as GameObject;
+        _characterDemo = Instantiate(Resources.Load("Char4"), _spawnPosition, Quaternion.identity) as GameObject;
 
-        _characterDemo.transform.position = _spawnPosition;
+        //_characterDemo.transform.position = _spawnPosition;
         _characterDemo.transform.eulerAngles = new Vector3(0, _yRot, 0);
 
         _char4 = true;
@@ -170,7 +193,15 @@ public class ChooseCharacter : ChooseCharacterManager
             0,
             _foregroundTextWidth, _foregroundTextHeight),
             _selectCharacterText);
-        //Arrow right
+
+        //Replace _selectArrow with controller specific textures
+        if(GameObject.FindGameObjectWithTag("ControllerManager")?
+            .GetComponent<ControllerManager>()?._xBOXController ?? false)
+        {
+            _selectCharacterArrowLeft = _selectCharacterArrowLeft;
+            _selectCharacterArrowRight = _selectCharacterArrowRight;
+        }
+        //Arrow right 
         GUI.DrawTexture(new Rect(
             Screen.width / 2 + (_foregroundTextWidth / 2),
             0,

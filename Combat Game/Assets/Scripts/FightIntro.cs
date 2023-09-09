@@ -47,7 +47,6 @@ public class FightIntro : MonoBehaviour
         _roundCounter = 1;
 
         _displayingRound = false;
-
         _displayingFight = false;
 
         StartCoroutine("FightIntroManager");
@@ -107,6 +106,18 @@ public class FightIntro : MonoBehaviour
     {
         _fightIntroFadeValue -= _fightIntroFadeSpeed * 2 * Time.deltaTime;
 
+        if(_fightIntroFadeValue < 0)
+            _fightIntroFadeValue= 0;
+
+        if(_fightIntroFadeValue == 0)
+        {
+            _displayingRound = false;
+            _displayingFight = false;
+
+            _fightIntroFinished = true;
+
+            StopCoroutine("FightIntroManager");
+        }
     }
 
     private void IncreaseRoundCounter()

@@ -229,7 +229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dfee9a23fd726e48a8497aca712954c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spawnPosition: {x: 0.24, y: -0.66, z: -4}
+  _spawnPosition: {x: 0.19, y: -0.63, z: -4}
   _selectCharacterTextBackground: {fileID: 2800000, guid: 6510f093e76ca1446bffd3a7c07a4c9e, type: 3}
   _selectCharacterTextForeground: {fileID: 2800000, guid: 073e38704d66ccd48ae678cc3e447435, type: 3}
   _selectCharacterText: {fileID: 2800000, guid: 1e466fbd21ec6db4b826330bf8f4593c, type: 3}

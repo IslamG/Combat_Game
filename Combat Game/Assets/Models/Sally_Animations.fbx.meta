@@ -33,11 +33,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Sally|ArmatureAction
-      takeName: Character|ArmatureAction
+      name: Character|Stand_Idle
+      takeName: Character|Stand_Idle
       internalID: -4217723589791460857
-      firstFrame: 0
-      lastFrame: 171
+      firstFrame: 1
+      lastFrame: 32
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -361,7 +361,7 @@ ModelImporter:
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
-      loop: 0
+      loop: 1
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0

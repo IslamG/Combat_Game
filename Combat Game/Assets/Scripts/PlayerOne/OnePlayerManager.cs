@@ -50,6 +50,14 @@ public class OnePlayerManager : MonoBehaviour
         if (_returnChar4)
             _playerOneCharacter = Instantiate(Resources.Load("Char4"), _playerOnePosition, Quaternion.Euler(_playerOneRotation)) as GameObject;
 
-        Debug.Log("p1 character " + _playerOneCharacter);
+        //Debug.Log("p1 character " + _playerOneCharacter);
+
+        FightCamera._playerOne = _playerOneCharacter;
+
+        _playerOneCharacter.GetComponent<PlayerOneMovement>().enabled = true;
+        _playerOneCharacter.GetComponent<PlayerOneHealth>().enabled = true;
+
+        _playerOneCharacter.GetComponent<OpponentAI>().enabled = false;
+        _playerOneCharacter.GetComponent<OpponentHealth>().enabled = false;
     }
 }

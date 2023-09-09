@@ -27,7 +27,9 @@ public class PlayerOneMovement : MonoBehaviour
     public AnimationClip[] _playerAttackAnim;
 
     private bool _returnDemoState;
-    private int _demoRotationValue = 75;
+    private int _demoRotationValue = 120;
+
+    private bool _fightIntroFinished; 
 
     private Vector3 _playerOneMoveDirection = Vector3.zero;
     private CollisionFlags _collisionFlags;
@@ -80,6 +82,11 @@ public class PlayerOneMovement : MonoBehaviour
             if (_playerOneAnim.IsPlaying(_playerAttackAnim[a].name))
                 return;
         }
+
+        _fightIntroFinished = FightIntro._fightIntroFinished;
+
+        if (!_fightIntroFinished) 
+            return;
 
         if (PlayerIsGrounded())
         {
@@ -290,7 +297,15 @@ public class PlayerOneMovement : MonoBehaviour
     {
         PlayerDemoAnim();
 
-        if(Input.GetAxis("Horizontal"))
+        if (Input.GetButtonDown("LeftTrigger")) //Horizontal//LeftTrigger
+        {
+            transform.Rotate(Vector3.up *_demoRotationValue * Time.deltaTime);
+        }
+
+        if (Input.GetButtonDown("RightTrigger")) //Horizontal//LeftTrigger
+        {
+            transform.Rotate(Vector3.down * _demoRotationValue * Time.deltaTime);
+        }
     }
 
     #endregion Player state methods
@@ -386,22 +401,24 @@ public class PlayerOneMovement : MonoBehaviour
     private void StandardInputManager()
     {
         //Debug.Log("Input H " + Input.GetAxis("Horizontal"));
-        if(Input.GetAxis("Horizontal") == 0) return;
+        if(Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0) return;
 
-        if (Input.GetAxis("Horizontal") < _controllerDeadZoneNeg)
+        //Debug.Log("Input V " + Input.GetAxis("Vertical"));
+        if (Input.GetAxis("Vertical") < _controllerDeadZonePos)
+        {
+            _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerJump;
+        }
+
+        if (Input.GetAxis("Horizontal") >  _controllerDeadZoneNeg)
         {
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerWalkLeft;
         }
 
-        if (Input.GetAxis("Horizontal") > _controllerDeadZonePos)
+        if (Input.GetAxis("Horizontal") < _controllerDeadZonePos)
         {
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerWalkRight;
         }
-        //Debug.Log("Input V " + Input.GetAxis("Vertical"));
-        if (Input.GetAxis("Vertical") > _controllerDeadZonePos)
-        {
-            _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerJump;
-        }
+        
     }
 
     private void ApplyGravity()

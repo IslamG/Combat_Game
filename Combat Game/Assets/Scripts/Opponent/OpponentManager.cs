@@ -78,8 +78,19 @@ public class OpponentManager : MonoBehaviour
              Instantiate(Resources.Load(_selectedOpponent + "Alt"), _opponentPosition, Quaternion.Euler(_opponentRotation)) as GameObject :
              Instantiate(Resources.Load(_selectedOpponent), _opponentPosition, Quaternion.Euler(_opponentRotation)) as GameObject;
 
-        Debug.Log("op character " + _currentOpponent);
-        
+        //Debug.Log("op character " + _currentOpponent);
+
+        FightCamera._opponent = _currentOpponent;
+
+        _currentOpponent.GetComponent<PlayerOneMovement>().enabled = false;
+        _currentOpponent.GetComponent<PlayerOneHealth>().enabled = false;
+
+        _currentOpponent.GetComponent<OpponentAI>().enabled = true;
+        _currentOpponent.GetComponent<OpponentHealth>().enabled = true;
+    }
+
+    private void SetOpponent()
+    {
 
     }
 }
