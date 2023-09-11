@@ -35,8 +35,10 @@ public class OpponentAI : MonoBehaviour
     {
         Initialize,
         OpponentIdle, 
-        OpponentHitBody, 
-        OpponentHitHead, 
+        OpponentHitByLowPunch, 
+        OpponentHitByHighPunch,
+        OpponentHitByLowKick,
+        OpponentHitByHighKick,
         WaitForAnimations,
         OpponentDefeated
     }
@@ -69,11 +71,11 @@ public class OpponentAI : MonoBehaviour
                 case OpponentAIState.OpponentIdle:
                     OpponentIdle();
                     break;
-                case OpponentAIState.OpponentHitBody:
-                    OpponentHitBody();
+                case OpponentAIState.OpponentHitByLowPunch:
+                    OpponentHitByLowPunch();
                     break;
-                case OpponentAIState.OpponentHitHead:
-                    OpponentHitHead();
+                case OpponentAIState.OpponentHitByHighPunch:
+                    OpponentHitByHighPunch();
                     break;
                 case OpponentAIState.WaitForAnimations:
                     WaitForAnimations();
@@ -108,34 +110,64 @@ public class OpponentAI : MonoBehaviour
             return;
 
     }
-    private void OpponentHitBody()
+    private void OpponentHitByLowPunch()
     {
         OpponentHitBodyAnim();
 
         _opponentAIAudioSource.PlayOneShot(_opponentBodyHitAudio);
 
-        Vector3 _impactPoint = OpponentBodyHit._opponentImpactPoint;
+        Vector3 _impactPoint = PlayerPunchLow._opponentImpactPoint;
 
         GameObject _he = Instantiate(_hitEffect,
-            _impactPoint,
-            //new Vector3(_opponentTransform.position.x,_opponentTransform.position.y * -1.1f, _opponentTransform.position.z), 
+            //_impactPoint,
+            new Vector3(_impactPoint.x - 0.6f, _impactPoint.y + 0.78f, _impactPoint.z - 0.6f), 
             Quaternion.identity) as GameObject;
 
         _opponentAIState = OpponentAIState.WaitForAnimations;
     }
-    private void OpponentHitHead()
+    private void OpponentHitByHighPunch()
     {
         OpponentHitHeadAnim();
 
         _opponentAIAudioSource.PlayOneShot(_opponentHeadHitAudio);
 
-        Vector3 _impactPoint = OpponentHeadHit._opponentImpactPoint;
+        Vector3 _impactPoint = PlayerPunchHigh._opponentImpactPoint;
 
         GameObject _he = Instantiate(_hitEffect, 
-            _impactPoint,
-            //new Vector3(_opponentTransform.position.x, _opponentTransform.position.y * -1.5f, _opponentTransform.position.z),
+            //_impactPoint,
+            new Vector3(_impactPoint.x - 0.6f,  _impactPoint.y * -1.5f, _impactPoint.z - 0.6f),
             Quaternion.identity) as GameObject;
         
+        _opponentAIState = OpponentAIState.WaitForAnimations;
+    }
+    private void OpponentHitByLowKick()
+    {
+        OpponentHitBodyAnim();
+
+        _opponentAIAudioSource.PlayOneShot(_opponentBodyHitAudio);
+
+        Vector3 _impactPoint = PlayerKickLow._opponentImpactPoint;
+
+        GameObject _he = Instantiate(_hitEffect,
+            //_impactPoint,
+            new Vector3(_impactPoint.x - 0.6f, _impactPoint.y + 0.78f, _impactPoint.z - 0.6f),
+            Quaternion.identity) as GameObject;
+
+        _opponentAIState = OpponentAIState.WaitForAnimations;
+    }
+    private void OpponentHitByHighKick()
+    {
+        OpponentHitHeadAnim();
+
+        _opponentAIAudioSource.PlayOneShot(_opponentHeadHitAudio);
+
+        Vector3 _impactPoint = PlayerKickHigh._opponentImpactPoint;
+
+        GameObject _he = Instantiate(_hitEffect,
+            //_impactPoint,
+            new Vector3(_impactPoint.x - 0.6f, _impactPoint.y * -1.5f, _impactPoint.z - 0.6f),
+            Quaternion.identity) as GameObject;
+
         _opponentAIState = OpponentAIState.WaitForAnimations;
     }
     private void WaitForAnimations()

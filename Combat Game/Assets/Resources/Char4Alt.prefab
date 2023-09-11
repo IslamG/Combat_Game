@@ -121,6 +121,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Char4Alt
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
+      propertyPath: m_TagString
+      value: BodyHitBox
+      objectReference: {fileID: 0}
     - target: {fileID: 1630794972795428178, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -214,6 +218,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4620943672821016935}
+    - targetCorrespondingSourceObject: {fileID: -7926544154110595155, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2089988164557751775}
+    - targetCorrespondingSourceObject: {fileID: -7926544154110595155, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4340439619280030212}
+    - targetCorrespondingSourceObject: {fileID: -1085918771063728151, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3136893534422727834}
+    - targetCorrespondingSourceObject: {fileID: -1085918771063728151, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1297612013183090737}
   m_SourcePrefab: {fileID: 100100000, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
 --- !u!4 &68073929820667140 stripped
 Transform:
@@ -423,3 +439,83 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &1622460846709437762 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7926544154110595155, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
+  m_PrefabInstance: {fileID: 539131909952871151}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &2089988164557751775
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1622460846709437762}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.002
+  m_Center: {x: 0, y: 0.001, z: 0}
+--- !u!114 &4340439619280030212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1622460846709437762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee663bc0a1468ab4782220af7a216f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _nextPunchIsAllowed: -1
+  _attackDelay: 1
+--- !u!1 &8616911367619792134 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1085918771063728151, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
+  m_PrefabInstance: {fileID: 539131909952871151}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &3136893534422727834
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8616911367619792134}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.003
+  m_Center: {x: 0, y: 0.002, z: 0}
+--- !u!114 &1297612013183090737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8616911367619792134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee663bc0a1468ab4782220af7a216f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _nextPunchIsAllowed: -1
+  _attackDelay: 1

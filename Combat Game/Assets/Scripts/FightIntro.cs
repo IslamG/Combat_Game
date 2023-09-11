@@ -20,7 +20,7 @@ public class FightIntro : MonoBehaviour
     public AudioClip _fightAnnouncement;
 
     private float _fightIntroFadeValue;
-    private float _fightIntroFadeSpeed = 0.33f;
+    private float _fightIntroFadeSpeed = 0.5f;
 
     private bool _displayingRound;
     private bool _displayingFight;

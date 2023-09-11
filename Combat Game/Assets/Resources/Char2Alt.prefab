@@ -121,6 +121,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Char2Alt
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
+      propertyPath: m_TagString
+      value: BodyHitBox
+      objectReference: {fileID: 0}
     - target: {fileID: 1630794972795428178, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -186,7 +190,59 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1535269002140004305}
+    - targetCorrespondingSourceObject: {fileID: -7926544154110595155, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4751029908968609821}
+    - targetCorrespondingSourceObject: {fileID: -7926544154110595155, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1437033513366339950}
+    - targetCorrespondingSourceObject: {fileID: -1085918771063728151, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7831965065195470003}
+    - targetCorrespondingSourceObject: {fileID: -1085918771063728151, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6308006156630242478}
   m_SourcePrefab: {fileID: 100100000, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
+--- !u!1 &3678112225943018171 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1085918771063728151, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
+  m_PrefabInstance: {fileID: 4892401462057602386}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &7831965065195470003
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3678112225943018171}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.003
+  m_Center: {x: 0, y: 0.002, z: 0}
+--- !u!114 &6308006156630242478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3678112225943018171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee663bc0a1468ab4782220af7a216f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _nextPunchIsAllowed: -1
+  _attackDelay: 1
 --- !u!4 &4931428707374394041 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
@@ -395,3 +451,43 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &5916057706879410943 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7926544154110595155, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
+  m_PrefabInstance: {fileID: 4892401462057602386}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &4751029908968609821
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5916057706879410943}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.002
+  m_Center: {x: 0, y: 0.001, z: 0}
+--- !u!114 &1437033513366339950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5916057706879410943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee663bc0a1468ab4782220af7a216f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _nextPunchIsAllowed: -1
+  _attackDelay: 1

@@ -22,7 +22,7 @@ public class ChooseCharacter : ChooseCharacterManager
     private float _arrowSize;
 
     private float _chooseCharacterInputTimer;
-    private float _chooseCharacterInputDelay = 0.1f;
+    private float _chooseCharacterInputDelay = 0.25f;
 
     public AudioClip _cycleCharacterButtonPress;
 
@@ -127,6 +127,8 @@ public class ChooseCharacter : ChooseCharacterManager
         DestroyObject(_characterDemo);
         _characterDemo = Instantiate(Resources.Load("Char1"), _spawnPosition, Quaternion.identity) as GameObject;
 
+        _characterDemo.GetComponent<OpponentAI>().enabled = false;
+        _characterDemo.GetComponent<OpponentHealth>().enabled = false;
         //_characterDemo.transform.position = _spawnPosition;
         _characterDemo.transform.eulerAngles = new Vector3(0, _yRot, 0);
 
@@ -140,6 +142,8 @@ public class ChooseCharacter : ChooseCharacterManager
         DestroyObject(_characterDemo);
         _characterDemo = Instantiate(Resources.Load("Char2"), _spawnPosition, Quaternion.identity) as GameObject;
 
+        _characterDemo.GetComponent<OpponentAI>().enabled = false;
+        _characterDemo.GetComponent<OpponentHealth>().enabled = false;
         //_characterDemo.transform.position = _spawnPosition;
         _characterDemo.transform.eulerAngles = new Vector3(0, _yRot, 0);
 
@@ -152,7 +156,9 @@ public class ChooseCharacter : ChooseCharacterManager
     {
         DestroyObject(_characterDemo);
         _characterDemo = Instantiate(Resources.Load("Char3"), _spawnPosition, Quaternion.identity) as GameObject;
-
+        
+        _characterDemo.GetComponent<OpponentAI>().enabled = false;
+        _characterDemo.GetComponent<OpponentHealth>().enabled = false;
         //_characterDemo.transform.position = _spawnPosition;
         _characterDemo.transform.eulerAngles = new Vector3(0, _yRot, 0);
 
@@ -166,6 +172,8 @@ public class ChooseCharacter : ChooseCharacterManager
         DestroyObject(_characterDemo);
         _characterDemo = Instantiate(Resources.Load("Char4"), _spawnPosition, Quaternion.identity) as GameObject;
 
+        _characterDemo.GetComponent<OpponentAI>().enabled = false;
+        _characterDemo.GetComponent<OpponentHealth>().enabled = false;
         //_characterDemo.transform.position = _spawnPosition;
         _characterDemo.transform.eulerAngles = new Vector3(0, _yRot, 0);
 

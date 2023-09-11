@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class OpponentHealth : MonoBehaviour
 {
-    public int _minimimOpponentHealth = 0;
-    public int _maximimOpponentHealth = 100;
-    public int _currentOpponentHealth;
+    public static int _minimimOpponentHealth = 0;
+    public static int _maximumOpponentHealth = 100;
+    public static int _currentOpponentHealth;
 
     private bool _isOpponentDefeated; 
 
     // Start is called before the first frame update
     void Start()
     {
-        _currentOpponentHealth = _maximimOpponentHealth;
+        _currentOpponentHealth = _maximumOpponentHealth;
         _isOpponentDefeated= false;
 
     }
