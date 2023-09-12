@@ -7,6 +7,17 @@ public class PlayerOneMovement : MonoBehaviour
     private Transform _playerOneTransform;
     private CharacterController _playerController;
 
+    public static GameObject _playerOne;
+    public static GameObject _opponent;
+
+    private Vector3 _playerPosition;
+    private Vector3 _opponentPosition;
+
+    private Quaternion _targetRotation;
+    private int _defaultRotation = 180;
+    private int _alternativeRotation = 0;
+    public float _rotationSpeed = 5f;
+
     public static bool _isPlayerPunchingLow; 
     public static bool _isPlayerPunchingHigh;
     public static bool _isPlayerKickingLow;
@@ -106,7 +117,10 @@ public class PlayerOneMovement : MonoBehaviour
 
             StandardInputManager();
         }
-        
+
+        UpdatePlayerPosition();
+        UpdateOpponentPosition();
+        UpdatePlayerRotation();
     }
 
     private IEnumerator PlayerOneFSM()
@@ -440,6 +454,41 @@ public class PlayerOneMovement : MonoBehaviour
         
     }
 
+    private void UpdatePlayerPosition()
+    {
+        _playerPosition = _playerOne.transform.position;
+    }
+    private void UpdateOpponentPosition()
+    {
+        _opponentPosition = _opponent.transform.position;
+    }
+    private void UpdatePlayerRotation()
+    {
+        if (_playerPosition.x > _opponentPosition.x)
+        {
+            if (_playerOne.transform.rotation.y == _defaultRotation)
+                return;
+            else
+            {
+                _targetRotation = Quaternion.Euler(0, _defaultRotation, 0);
+                _playerOne.transform.rotation = Quaternion.Slerp(transform.rotation,
+                    _targetRotation, Time.deltaTime * _rotationSpeed);
+            }
+        }
+
+        if (_playerPosition.x < _opponentPosition.x)
+        {
+            if (_playerOne.transform.rotation.y == _alternativeRotation)
+                return;
+            else
+            {
+                _targetRotation = Quaternion.Euler(0, _alternativeRotation, 0);
+                _playerOne.transform.rotation = Quaternion.Slerp(transform.rotation,
+                    _targetRotation, Time.deltaTime * _rotationSpeed);
+            }
+        }
+    }
+
     private void ApplyGravity()
     {
         if (PlayerIsGrounded())
@@ -451,7 +500,6 @@ public class PlayerOneMovement : MonoBehaviour
             _playerSpeedYAxis -= _playerGravity * _playerGravityModifier * Time.deltaTime;
         }
     }
-
     public bool PlayerIsGrounded()
     {
         return (_collisionFlags & CollisionFlags.CollidedBelow) != 0;

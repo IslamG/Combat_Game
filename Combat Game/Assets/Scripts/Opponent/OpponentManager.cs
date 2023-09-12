@@ -81,6 +81,9 @@ public class OpponentManager : MonoBehaviour
         //Debug.Log("op character " + _currentOpponent);
 
         FightCamera._opponent = _currentOpponent;
+        OpponentAI._opponent = _currentOpponent;
+        PlayerOneMovement._opponent = _currentOpponent;
+
 
         _currentOpponent.GetComponent<PlayerOneMovement>().enabled = false;
         _currentOpponent.GetComponent<PlayerOneHealth>().enabled = false;

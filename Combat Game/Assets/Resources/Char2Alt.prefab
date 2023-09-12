@@ -291,6 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dc5e14a21da76e40925ec711a4615b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _rotationSpeed: 5
   _playerWalkSpeed: 1
   _playerRetreatSpeed: 0.75
   _playerJumpHeight: 5
@@ -333,9 +334,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b583d336f7002d2418e92d82c34c2d27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minimimOpponentHealth: 0
-  _maximimOpponentHealth: 100
-  _currentOpponentHealth: 0
 --- !u!114 &-9181553648904608479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,13 +346,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a411d3a14f6c2a4a9b40360b5d620fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _rotationSpeed: 5
+  _opponentWalkSpeed: 1
   _opponentIdleAnim: {fileID: -8739171710824898483, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
   _opponentHitBodyAnim: {fileID: 7400000, guid: 0249f3cfc180c5f46a378d5dcdc74e71, type: 2}
   _opponentHitHeadAnim: {fileID: 7400000, guid: 83ee5d023125e6a4fa8f0fa8e3dcdca9, type: 2}
   _opponentDefeatedAnim: {fileID: -800287407008964191, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
+  _opponentWalkAnim: {fileID: 3739893752284827302, guid: 3bb473318ceed9a4480a66e72f08c7ee, type: 3}
   _opponentHeadHitAudio: {fileID: 0}
   _opponentBodyHitAudio: {fileID: 0}
   _hitEffect: {fileID: 6710532874420150704, guid: 2e9e0c88daecc334c85cbd68e10effb8, type: 3}
+  _tippingPointDecideValue: 0
+  _passiveTime: 3
 --- !u!82 &1535269002140004305
 AudioSource:
   m_ObjectHideFlags: 0

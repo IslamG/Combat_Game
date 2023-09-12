@@ -53,6 +53,8 @@ public class OnePlayerManager : MonoBehaviour
         //Debug.Log("p1 character " + _playerOneCharacter);
 
         FightCamera._playerOne = _playerOneCharacter;
+        OpponentAI._playerOne = _playerOneCharacter;
+        PlayerOneMovement._playerOne = _playerOneCharacter;
 
         _playerOneCharacter.GetComponent<PlayerOneMovement>().enabled = true;
         _playerOneCharacter.GetComponent<PlayerOneHealth>().enabled = true;

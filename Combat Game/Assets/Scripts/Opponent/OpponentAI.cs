@@ -7,11 +7,24 @@ public class OpponentAI : MonoBehaviour
     private Transform _opponentTransform;
     private CharacterController _opponentController;
 
+    public static GameObject _playerOne;
+    public static GameObject _opponent;
+
+    private Vector3 _playerPosition;
+    private Vector3 _opponentPosition;
+
+    private Quaternion _targetRotation;
+    private int _defaultRotation = 0;
+    private int _alternativeRotation = 180;
+    public float _rotationSpeed = 5f;
+    public float _opponentWalkSpeed = 1.0f;
+
     private Animation _opponentAnim;
     public AnimationClip _opponentIdleAnim;
     public AnimationClip _opponentHitBodyAnim;
     public AnimationClip _opponentHitHeadAnim;
     public AnimationClip _opponentDefeatedAnim;
+    public AnimationClip _opponentWalkAnim;
 
     private AudioSource _opponentAIAudioSource;
     public AudioClip _opponentHeadHitAudio;
@@ -21,11 +34,27 @@ public class OpponentAI : MonoBehaviour
 
     private Vector3 _opponentMoveDirection = Vector3.zero;
 
-    private bool _fightIntroFinished;
-
     private float _opponentGravity = 5f;
     private float _opponentGravityModifier = 5f;
     private float _opponentVerticalSpeed = 0.0f;
+
+    public RangeInt _offensivePriority = new RangeInt(1, 3);
+    public RangeInt _passivePriority = new RangeInt(4, 6);
+    public RangeInt _defensivePriority = new RangeInt(7, 9);
+
+    private int _decideMoveForwards; 
+    private int _decideMoveBackwards;
+
+    private int _minimumDecideValue;
+    private int _maximumDecideValue;
+
+    public int _tippingPointDecideValue;
+
+    private int _decideAggressionPriority;
+    private bool _isPassive;
+    public float _passiveTime = 3;
+
+    private bool _fightIntroFinished;
 
     private CollisionFlags _collisionFlagsOpponent;
 
@@ -35,6 +64,10 @@ public class OpponentAI : MonoBehaviour
     {
         Initialize,
         OpponentIdle, 
+        Advance,
+        StayPassive,
+        Retreat,
+        Walk,
         OpponentHitByLowPunch, 
         OpponentHitByHighPunch,
         OpponentHitByLowKick,
@@ -51,12 +84,22 @@ public class OpponentAI : MonoBehaviour
         _opponentTransform = transform;
         _opponentMoveDirection = Vector3.zero;
 
+        _decideAggressionPriority = 0;
+        _isPassive = false;
+
+        _minimumDecideValue = 1;
+        _maximumDecideValue = 10;
+
         StartCoroutine("OpponentFSM");
     }
 
     private void Update()
     {
         ApplyOpponentGravity();
+
+        UpdatePlayerPosition();
+        UpdateOpponentPosition();
+        UpdateOpponentRotation();
     }
     
     private IEnumerator OpponentFSM()
@@ -71,11 +114,26 @@ public class OpponentAI : MonoBehaviour
                 case OpponentAIState.OpponentIdle:
                     OpponentIdle();
                     break;
+                case OpponentAIState.Advance:
+                    Advance();
+                    break;
+                case OpponentAIState.Retreat:
+                    Retreat();
+                    break;
+                case OpponentAIState.Walk:
+                    Walk();
+                    break;
                 case OpponentAIState.OpponentHitByLowPunch:
                     OpponentHitByLowPunch();
                     break;
                 case OpponentAIState.OpponentHitByHighPunch:
                     OpponentHitByHighPunch();
+                    break;
+                case OpponentAIState.OpponentHitByLowKick:
+                    OpponentHitByLowKick();
+                    break;
+                case OpponentAIState.OpponentHitByHighKick:
+                    OpponentHitByHighKick();
                     break;
                 case OpponentAIState.WaitForAnimations:
                     WaitForAnimations();
@@ -90,12 +148,37 @@ public class OpponentAI : MonoBehaviour
 
     private void Initialize()
     {
+        _decideAggressionPriority = Random.Range(1, 9);
         _opponentAIState = OpponentAIState.OpponentIdle;
     }
     private void OpponentIdle()
     {
         OpponentIdleAnim();
+        Idle();
+
+        _fightIntroFinished = FightIntro._fightIntroFinished;
+        if (!_fightIntroFinished)
+            return;
+
+        if (_decideAggressionPriority < _passivePriority.start)
+            _opponentAIState = OpponentAIState.Advance;
+        if (_decideAggressionPriority > _passivePriority.end &&
+            _decideAggressionPriority < _defensivePriority.start)
+        {
+            if (_isPassive) return;
+
+            _isPassive = true;
+            
+            StayPassive();
+        }
+        if (_decideAggressionPriority == _defensivePriority.start)
+            _opponentAIState = OpponentAIState.Retreat;
+
         
+
+    }
+    private void Idle()
+    {
         if (OpponentIsGrounded()) return;
 
         _opponentMoveDirection = new Vector3(0, _opponentVerticalSpeed, 0);
@@ -103,11 +186,6 @@ public class OpponentAI : MonoBehaviour
         _opponentMoveDirection = _opponentTransform.TransformDirection(_opponentMoveDirection);
 
         _collisionFlagsOpponent = _opponentController.Move(_opponentMoveDirection * Time.deltaTime);
-
-        _fightIntroFinished = FightIntro._fightIntroFinished;
-
-        if (!_fightIntroFinished)
-            return;
 
     }
     private void OpponentHitByLowPunch()
@@ -179,6 +257,51 @@ public class OpponentAI : MonoBehaviour
 
         _opponentAIState = OpponentAIState.OpponentIdle;
     }
+    private void Walk()
+    {
+        Debug.Log("called walk");
+        _opponentMoveDirection = (_playerPosition - transform.position) * _opponentWalkSpeed;
+        _opponentMoveDirection.Normalize();
+
+        _opponentMoveDirection.y = 0;
+        _opponentMoveDirection.z = 0;
+
+        _collisionFlagsOpponent = _opponentController.Move(_opponentMoveDirection * Time.deltaTime);
+
+        OpponentWalkAnim();
+    }
+    private void Advance()
+    {
+        //_opponentAIState = OpponentAIState.Attack;
+        _decideMoveForwards = Random.Range(1, 10);
+
+        if(_decideMoveForwards >= _minimumDecideValue && 
+            _decideMoveForwards <= _tippingPointDecideValue)
+        {
+
+        }
+        if (_decideMoveForwards <= _maximumDecideValue &&
+            _decideMoveForwards <= _tippingPointDecideValue)
+        {
+
+        }
+    }
+    private void StayPassive()
+    {
+        //_opponentAIState = OpponentAIState.StayPassive;
+    }
+    private void Retreat()
+    {
+        //_opponentAIState = OpponentAIState.Retreat;
+        _decideMoveBackwards = Random.Range(1, 10);
+
+        if (_decideMoveBackwards >= _minimumDecideValue &&
+            _decideMoveBackwards <= _tippingPointDecideValue)
+        {
+
+        }
+        
+    }
     private void OpponentDefeated()
     {
         _opponentMoveDirection = new Vector3(0, _opponentVerticalSpeed, 0);
@@ -197,9 +320,15 @@ public class OpponentAI : MonoBehaviour
         OpponentDefeatedAnim();
         _opponentAIState = OpponentAIState.OpponentDefeated;
     }
+
     private void OpponentIdleAnim()
     {
         _opponentAnim.CrossFade(_opponentIdleAnim.name);
+    }
+    private void OpponentWalkAnim()
+    {
+        Debug.Log("reached animation");
+        _opponentAnim.CrossFade(_opponentWalkAnim.name);
     }
     private void OpponentHitBodyAnim()
     {
@@ -214,6 +343,41 @@ public class OpponentAI : MonoBehaviour
         _opponentAnim.CrossFade(_opponentDefeatedAnim.name);
     }
 
+    private void UpdatePlayerPosition()
+    {
+        _playerPosition = _playerOne.transform.position;
+    }
+    private void UpdateOpponentPosition()
+    {
+        _opponentPosition = _opponent.transform.position;
+    }
+    private void UpdateOpponentRotation()
+    {
+        if (_playerPosition.x > _opponentPosition.x)
+        {
+            if (_opponent.transform.rotation.y == _defaultRotation)
+                return;
+            else
+            {
+                _targetRotation = Quaternion.Euler(0, _defaultRotation, 0);
+                _opponent.transform.rotation = Quaternion.Slerp(transform.rotation,
+                    _targetRotation, Time.deltaTime * _rotationSpeed);
+            }
+        }
+
+        if (_playerPosition.x < _opponentPosition.x)
+        {
+            if (_opponent.transform.rotation.y == _alternativeRotation)
+                return;
+            else
+            {
+                _targetRotation = Quaternion.Euler(0, _alternativeRotation, 0);
+                _opponent.transform.rotation = Quaternion.Slerp(transform.rotation,
+                    _targetRotation, Time.deltaTime * _rotationSpeed);
+            }
+        }
+    }
+
     void ApplyOpponentGravity()
     {
         if (OpponentIsGrounded())
@@ -224,7 +388,6 @@ public class OpponentAI : MonoBehaviour
                 _opponentGravity * _opponentGravityModifier * Time.deltaTime;
         }
     }
-
     public bool OpponentIsGrounded() => 
         (_collisionFlagsOpponent & CollisionFlags.CollidedBelow) != 0;
 }
