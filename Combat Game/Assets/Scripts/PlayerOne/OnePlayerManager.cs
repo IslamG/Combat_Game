@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OnePlayerManager : MonoBehaviour
+public class OnePlayerManager : GameManager
 {
-    public Vector3 _playerOnePosition = new Vector3();
-    public Vector3 _playerOneRotation = new Vector3();
+    private Vector3 _playerOnePosition; //= new Vector3();
+    private Vector3 _playerOneRotation;// = new Vector3();
 
     private GameObject _playerOneCharacter;
 
@@ -17,7 +17,8 @@ public class OnePlayerManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        _playerOnePosition = _playerStartingPosition;
+        _playerOneRotation = _playerStartingRotation;
     }
 
     // Update is called once per frame

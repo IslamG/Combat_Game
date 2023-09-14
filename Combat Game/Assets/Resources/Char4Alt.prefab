@@ -282,12 +282,13 @@ MonoBehaviour:
   _rotationSpeed: 5
   _playerWalkSpeed: 1
   _playerRetreatSpeed: 0.75
-  _playerJumpHeight: 5
-  _playerJumpSpeed: 5
-  _playerJumpHorizontal: 5
+  _playerJumpHeight: 1
+  _playerJumpSpeed: 8
+  _playerJumpHorizontal: 1
   _controllerDeadZonePos: 0.1
   _controllerDeadZoneNeg: -0.1
-  _playerGravity: 20
+  _degreeModifier: 10
+  _playerGravity: 10
   _playerGravityModifier: 5
   _playerSpeedYAxis: 0
   _playerOneIdleClip: {fileID: -8739171710824898483, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
@@ -341,10 +342,14 @@ MonoBehaviour:
   _opponentHitHeadAnim: {fileID: 7400000, guid: 83ee5d023125e6a4fa8f0fa8e3dcdca9, type: 2}
   _opponentDefeatedAnim: {fileID: -800287407008964191, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
   _opponentWalkAnim: {fileID: 3739893752284827302, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
+  _opponentJumpAnim: {fileID: 7046457665603563217, guid: bfae8d3f2cd8b214297f3d3319b3a0ad, type: 3}
   _opponentHeadHitAudio: {fileID: 0}
   _opponentBodyHitAudio: {fileID: 0}
   _hitEffect: {fileID: 6710532874420150704, guid: 2e9e0c88daecc334c85cbd68e10effb8, type: 3}
-  _tippingPointDecideValue: 0
+  _opponentJumpHeight: 0.5
+  _opponentJumpSpeed: 1
+  _opponentJumpHorizontal: 1
+  _tippingPointDecideValue: 3
   _passiveTime: 3
 --- !u!82 &4620943672821016935
 AudioSource:

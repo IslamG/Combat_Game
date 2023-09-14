@@ -36,7 +36,7 @@ ModelImporter:
       name: Gray|ArmatureAction
       takeName: Character|ArmatureAction
       internalID: -4217723589791460857
-      firstFrame: 1
+      firstFrame: 0
       lastFrame: 171
       wrapMode: 0
       orientationOffsetY: 0
@@ -124,7 +124,7 @@ ModelImporter:
       takeName: Character|Jump
       internalID: 7046457665603563217
       firstFrame: 1
-      lastFrame: 132
+      lastFrame: 6
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

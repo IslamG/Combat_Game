@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OpponentManager : MonoBehaviour
+public class OpponentManager : GameManager
 {
-    public Vector3 _opponentPosition = new Vector3();
-    public Vector3 _opponentRotation = new Vector3();
+    private  Vector3 _opponentPosition;// = new Vector3();
+    private Vector3 _opponentRotation;// = new Vector3();
 
     public GameObject _currentOpponent;
 
@@ -28,6 +28,8 @@ public class OpponentManager : MonoBehaviour
     {
         DontDestroyOnLoad(this);
 
+        _opponentPosition = _opponentStartingPosition;
+        _opponentRotation = _opponentStartingRotation;
         
         _opponentCounter = 0;
 

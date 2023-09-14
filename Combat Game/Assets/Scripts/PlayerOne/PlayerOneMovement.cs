@@ -25,12 +25,22 @@ public class PlayerOneMovement : MonoBehaviour
 
     public float _playerWalkSpeed = 1f;
     public float _playerRetreatSpeed = 0.75f;
-    public float _playerJumpHeight = 5f;
-    public float _playerJumpSpeed = 5f;
-    public float _playerJumpHorizontal = 5f;
+    public float _playerJumpHeight = 0.5f;
+    public float _playerJumpSpeed = 1f;
+    public float _playerJumpHorizontal = 1f;
+    private Vector3 _jumpHeightTemp; 
 
     public float _controllerDeadZonePos = 0.1f;
     public float _controllerDeadZoneNeg = -0.1f;
+
+    private float _xAxis;
+    private float _yAxis;
+    private float _directionAngle;
+
+    private int _zeroDegreeAngle = 0;
+    private int _90DegreeAngle = 90;
+    private int _180DegreeAngle = 180;
+    public float _degreeModifier = 22.5f;
 
     public float _playerGravity = 20f;
     public float _playerGravityModifier = 5;
@@ -61,12 +71,38 @@ public class PlayerOneMovement : MonoBehaviour
         WaitForAnimations, 
         PlayerDemo
     }
-    // Start is called before the first frame update
+    private IEnumerator PlayerOneFSM()
+    {
+        while (true)
+        {
+            switch (_playerOneStates)
+            {
+                case PlayerOneStates.PlayerOneIdle: PlayerOneIdle(); break;
+                case PlayerOneStates.PlayerWalkLeft: PlayerWalkLeft(); break;
+                case PlayerOneStates.PlayerWalkRight: PlayerWalkRight(); break;
+                case PlayerOneStates.PlayerJump: PlayerJump(); break;
+                case PlayerOneStates.PlayerJumpForwards: PlayerJumpForwards(); break;
+                case PlayerOneStates.PlayerJumpBackwards: PlayerJumpBackwards(); break;
+                case PlayerOneStates.PlayerComeDown: PlayerComeDown(); break;
+                case PlayerOneStates.PlayerComeDownForwards: PlayeComeDownForwards(); break;
+                case PlayerOneStates.PlayerComeDownBackwards: PlayerComeDownBackwards(); break;
+                case PlayerOneStates.PlayerHighPunch: PlayerHighPunch(); break;
+                case PlayerOneStates.PlayerLowPunch: PlayerLowPunch(); break;
+                case PlayerOneStates.PlayerHighKick: PlayerHighKick(); break;
+                case PlayerOneStates.PlayerLowKick: PlayerLowKick(); break;
+                case PlayerOneStates.WaitForAnimations: WaitForAnimations(); break;
+                case PlayerOneStates.PlayerDemo: PlayerDemo(); break;
+            }
+            yield return null;
+        }
+    }
+
     void Start()
     {
         _playerOneTransform = transform;
         _playerOneMoveDirection = Vector3.zero;
 
+        _jumpHeightTemp = new Vector3(0, _playerJumpHeight, 0);
         _playerSpeedYAxis = 0;
 
         _playerController = GetComponent<CharacterController>();
@@ -92,11 +128,10 @@ public class PlayerOneMovement : MonoBehaviour
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerDemo;
         }
     }
-
-    // Update is called once per frame
     void Update()
     {
         ApplyGravity();
+        InputController();
 
         for (int a = 0; a < _playerAttackAnim.Length; a++)
         {
@@ -112,9 +147,7 @@ public class PlayerOneMovement : MonoBehaviour
         if (PlayerIsGrounded())
         {
             HorizontalJumpInputManager();
-
             AttackInputManager();
-
             StandardInputManager();
         }
 
@@ -123,34 +156,7 @@ public class PlayerOneMovement : MonoBehaviour
         UpdatePlayerRotation();
     }
 
-    private IEnumerator PlayerOneFSM()
-    {
-        while (true)
-        {
-            switch (_playerOneStates)
-            {
-                case PlayerOneStates.PlayerOneIdle: PlayerOneIdle();break;
-                case PlayerOneStates.PlayerWalkLeft: PlayerWalkLeft();break;
-                case PlayerOneStates.PlayerWalkRight: PlayerWalkRight();break;
-                case PlayerOneStates.PlayerJump: PlayerJump();break;
-                case PlayerOneStates.PlayerJumpForwards: PlayerJumpForwards();break;
-                case PlayerOneStates.PlayerJumpBackwards: PlayerJumpBackwards();break;
-                case PlayerOneStates.PlayerComeDown: PlayerComeDown();break;
-                case PlayerOneStates.PlayerComeDownForwards: PlayeComeDownForwards();break;
-                case PlayerOneStates.PlayerComeDownBackwards: PlayerComeDownBackwards();break;
-                case PlayerOneStates.PlayerHighPunch: PlayerHighPunch();break;
-                case PlayerOneStates.PlayerLowPunch: PlayerLowPunch();break;
-                case PlayerOneStates.PlayerHighKick: PlayerHighKick();break;
-                case PlayerOneStates.PlayerLowKick: PlayerLowKick();break;
-                case PlayerOneStates.WaitForAnimations: WaitForAnimations();break;
-                case PlayerOneStates.PlayerDemo: PlayerDemo();break;
-            }
-            yield return null;
-        }
-    }
-
     #region Player state methods
-
     private void PlayerOneIdle()
     {
         PlayerOneIdleAnim();
@@ -164,7 +170,6 @@ public class PlayerOneMovement : MonoBehaviour
 
         _collisionFlags = _playerController.Move(_playerOneMoveDirection * Time.deltaTime);
     }
-    
     private void PlayerWalkLeft()
     {
         PlayerRetreatAnim();
@@ -180,7 +185,6 @@ public class PlayerOneMovement : MonoBehaviour
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerOneIdle;
         }
     }
-    
     private void PlayerWalkRight()
     {
         PlayerWalkAnim();
@@ -191,12 +195,12 @@ public class PlayerOneMovement : MonoBehaviour
 
         _collisionFlags = _playerController.Move(_playerOneMoveDirection * Time.deltaTime);
 
-        if (Input.GetAxis("Horizontal") > 0f)
+        if (_directionAngle < (_180DegreeAngle - _degreeModifier)
+                && _directionAngle > 0 - (_180DegreeAngle + _degreeModifier))
         {
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerOneIdle;
         }
     }
-
     private void PlayerJump()
     {
         PlayerJumpAnim();
@@ -207,12 +211,11 @@ public class PlayerOneMovement : MonoBehaviour
 
         _collisionFlags = _playerController.Move(_playerOneMoveDirection * Time.deltaTime);
 
-        if (_playerOneTransform.transform.position.y >= _playerJumpHeight)
+        if (_playerOneTransform.transform.position.y >= _jumpHeightTemp.y)
         {
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerComeDown;
         }
     }
-
     private void PlayerJumpForwards()
     {
         PlayerJumpAnim();
@@ -223,12 +226,11 @@ public class PlayerOneMovement : MonoBehaviour
 
         _collisionFlags = _playerController.Move(_playerOneMoveDirection * Time.deltaTime);
 
-        if (_playerOneTransform.transform.position.y >= _playerJumpHeight)
+        if (_playerOneTransform.transform.position.y >= _jumpHeightTemp.y)
         {
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerComeDownForwards;
         }
     }
-
     private void PlayerJumpBackwards()
     {
         PlayerJumpAnim();
@@ -238,13 +240,12 @@ public class PlayerOneMovement : MonoBehaviour
         _playerOneMoveDirection *= _playerJumpSpeed;
 
         _collisionFlags = _playerController.Move(_playerOneMoveDirection * Time.deltaTime);
-
-        if (_playerOneTransform.transform.position.y >= _playerJumpHeight)
+        
+        if (_playerOneTransform.transform.position.y >= _jumpHeightTemp.y)
         {
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerComeDownBackwards;
         }
     }
-
     private void PlayerComeDown()
     {
         _playerOneMoveDirection = new Vector3(0, _playerSpeedYAxis, 0);
@@ -255,7 +256,6 @@ public class PlayerOneMovement : MonoBehaviour
         if(PlayerIsGrounded())
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerOneIdle;
     }
-
     private void PlayeComeDownForwards()
     {
         _playerOneMoveDirection = new Vector3(-_playerJumpHorizontal, _playerSpeedYAxis, 0);
@@ -266,7 +266,6 @@ public class PlayerOneMovement : MonoBehaviour
         if (PlayerIsGrounded())
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerOneIdle;
     }
-
     private void PlayerComeDownBackwards()
     {
         _playerOneMoveDirection = new Vector3(_playerJumpHorizontal, _playerSpeedYAxis, 0);
@@ -277,7 +276,6 @@ public class PlayerOneMovement : MonoBehaviour
         if (PlayerIsGrounded())
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerOneIdle;
     }
-
     private void PlayerHighPunch()
     {
         PlayerHighPunchAnim();
@@ -285,7 +283,6 @@ public class PlayerOneMovement : MonoBehaviour
         _isPlayerPunchingHigh = true;
         _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForAnimations;
     }
-
     private void PlayerLowPunch()
     {
         PlayerLowPunchAnim();
@@ -293,7 +290,6 @@ public class PlayerOneMovement : MonoBehaviour
         _isPlayerPunchingLow = true;
         _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForAnimations;
     }
-
     private void PlayerHighKick()
     {
         PlayerHighKickAnim();
@@ -301,7 +297,6 @@ public class PlayerOneMovement : MonoBehaviour
         _isPlayerKickingHigh = true;
         _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForAnimations;
     }
-
     private void PlayerLowKick()
     {
         PlayerLowKickAnim();
@@ -309,7 +304,6 @@ public class PlayerOneMovement : MonoBehaviour
         _isPlayerKickingLow = true;
         _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForAnimations;
     }
-
     private void WaitForAnimations()
     {
         for(int a = 0; a < _playerAttackAnim.Length; a++)
@@ -325,7 +319,6 @@ public class PlayerOneMovement : MonoBehaviour
 
         _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForAnimations; 
     }
-
     private void PlayerDemo()
     {
         PlayerDemoAnim();
@@ -340,17 +333,14 @@ public class PlayerOneMovement : MonoBehaviour
             transform.Rotate(Vector3.down * _demoRotationValue * Time.deltaTime);
         }
     }
-
     #endregion Player state methods
 
     #region Animation methods
-    
     private void PlayerOneIdleAnim()
     {
        // Debug.Log(_playerOneIdleClip + " " + _playerOneIdleClip.name);
         _playerOneAnim.CrossFade(_playerOneIdleClip.name); 
     }
-
     private void PlayerWalkAnim()
     {
         _playerOneAnim.CrossFade(_playerWalkClip.name);
@@ -362,7 +352,6 @@ public class PlayerOneMovement : MonoBehaviour
             _playerOneAnim[_playerWalkClip.name].speed = _playerWalkSpeed;
 
     }
-
     private void PlayerRetreatAnim()
     {
         _playerOneAnim.CrossFade(_playerWalkClip.name);
@@ -373,40 +362,40 @@ public class PlayerOneMovement : MonoBehaviour
         if (_playerOneAnim[_playerWalkClip.name].speed > _playerRetreatSpeed)
             _playerOneAnim[_playerWalkClip.name].speed = _playerRetreatSpeed;
     }
-
     private void PlayerJumpAnim()
     {
         _playerOneAnim.CrossFade(_playerJumpClip.name);
     }
-
     private void PlayerHighPunchAnim()
     {
         _playerOneAnim.CrossFade(_playerAttackAnim[0].name);
     }
-
     private void PlayerLowPunchAnim()
     {
         _playerOneAnim.CrossFade(_playerAttackAnim[1].name);
     }
-
     private void PlayerHighKickAnim()
     {
         _playerOneAnim.CrossFade(_playerAttackAnim[2].name);
     }
-
     private void PlayerLowKickAnim()
     {
         _playerOneAnim.CrossFade(_playerAttackAnim[3].name);
     }
-
     private void PlayerDemoAnim()
     {
         _playerOneAnim.CrossFade(_playerOneIdleClip.name);
     }
-
     #endregion Animation methods
 
+    #region Input Management
+    private void InputController()
+    {
+        _xAxis = Input.GetAxis("Horizontal");
+        _yAxis = Input.GetAxis("Vertical");
 
+        _directionAngle = Mathf.Atan2(_yAxis, _xAxis) * Mathf.Rad2Deg;
+    }
     private void AttackInputManager()
     {
         if (Input.GetButtonDown("Fire1"))
@@ -418,41 +407,62 @@ public class PlayerOneMovement : MonoBehaviour
         if (Input.GetButtonDown("Fire4"))
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerLowKick;
     }
-
     private void HorizontalJumpInputManager()
     {
-        if(Input.GetAxis("Vertical") > _controllerDeadZonePos && 
-            Input.GetAxis("Horizontal") > _controllerDeadZoneNeg)
-            _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerJumpForwards;
+        if (Input.GetAxis("Vertical") > _controllerDeadZonePos &&
+            Input.GetAxis("Horizontal") > 0)
+        {
+            if (_directionAngle > 45 + _degreeModifier
+                || _directionAngle < 45 - _degreeModifier)
+                return;
+            
+            _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerJumpBackwards;
+        }
 
         if (Input.GetAxis("Vertical") > _controllerDeadZonePos &&
-            Input.GetAxis("Horizontal") < _controllerDeadZoneNeg)
-            _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerJumpBackwards;
+            Input.GetAxis("Horizontal") < 0)
+        {
+            if (_directionAngle > 135 + _degreeModifier
+                || _directionAngle < 135 - _degreeModifier)
+                return;
+
+            _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerJumpForwards;
+        }
 
     }
-
     private void StandardInputManager()
     {
         //Debug.Log("Input H " + Input.GetAxis("Horizontal"));
-        if(Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0) return;
-
         //Debug.Log("Input V " + Input.GetAxis("Vertical"));
-        if (Input.GetAxis("Vertical") < _controllerDeadZonePos)
+
+        if (Input.GetAxis("Horizontal") <  _controllerDeadZoneNeg)
         {
-            _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerJump;
+            if (_directionAngle < (_180DegreeAngle - _degreeModifier)
+                && _directionAngle > 0 - (_180DegreeAngle + _degreeModifier))
+                return;
+
+            _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerWalkRight;
         }
 
-        if (Input.GetAxis("Horizontal") >  _controllerDeadZoneNeg)
+        if (Input.GetAxis("Horizontal") > _controllerDeadZonePos)
         {
+            if (_directionAngle > (0 + _degreeModifier)
+                || _directionAngle < 0 - _degreeModifier)
+                return;
+
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerWalkLeft;
         }
 
-        if (Input.GetAxis("Horizontal") < _controllerDeadZonePos)
+        if (Input.GetAxis("Vertical") > _controllerDeadZonePos)
         {
-            _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerWalkRight;
+            if (_directionAngle > 90 + _degreeModifier
+                || _directionAngle < 90 - _degreeModifier)
+                return;
+
+            _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerJump;
         }
-        
     }
+    #endregion InputManagement
 
     private void UpdatePlayerPosition()
     {

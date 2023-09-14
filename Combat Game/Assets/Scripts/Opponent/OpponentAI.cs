@@ -25,6 +25,12 @@ public class OpponentAI : MonoBehaviour
     public AnimationClip _opponentHitHeadAnim;
     public AnimationClip _opponentDefeatedAnim;
     public AnimationClip _opponentWalkAnim;
+    public AnimationClip _opponentJumpAnim;
+
+    public AnimationClip _opponentPunchHighAnim;
+    public AnimationClip _opponentPunchLowAnim;
+    public AnimationClip _opponentKickHighAnim;
+    public AnimationClip _opponentKickLowAnim;
 
     private AudioSource _opponentAIAudioSource;
     public AudioClip _opponentHeadHitAudio;
@@ -33,6 +39,11 @@ public class OpponentAI : MonoBehaviour
     public GameObject _hitEffect;
 
     private Vector3 _opponentMoveDirection = Vector3.zero;
+
+    public float _opponentJumpHeight = 0.5f;
+    public float _opponentJumpSpeed = 1;
+    public float _opponentJumpHorizontal = 1f;
+    private Vector3 _jumpHeightTemp;
 
     private float _opponentGravity = 5f;
     private float _opponentGravityModifier = 5f;
@@ -48,11 +59,11 @@ public class OpponentAI : MonoBehaviour
     private int _minimumDecideValue;
     private int _maximumDecideValue;
 
-    public int _tippingPointDecideValue;
+    public int _tippingPointDecideValue = 1;
 
     private int _decideAggressionPriority;
     private bool _isPassive;
-    public float _passiveTime = 3;
+    public float _passiveTime = 2;
 
     private bool _fightIntroFinished;
 
@@ -67,7 +78,14 @@ public class OpponentAI : MonoBehaviour
         Advance,
         StayPassive,
         Retreat,
-        Walk,
+        WalkTowardsPlayer,
+        WalkAwayFromPlayer,
+        JumpUp, 
+        JumpTowardsPlayer, 
+        JumpAwayFromPlayer,
+        ComeDown, 
+        ComeDownForward, 
+        ComeDownBackwards,
         OpponentHitByLowPunch, 
         OpponentHitByHighPunch,
         OpponentHitByLowKick,
@@ -83,6 +101,8 @@ public class OpponentAI : MonoBehaviour
         _opponentAIAudioSource = GetComponent<AudioSource>();
         _opponentTransform = transform;
         _opponentMoveDirection = Vector3.zero;
+
+        _jumpHeightTemp = new Vector3(0, _opponentJumpHeight, 0);
 
         _decideAggressionPriority = 0;
         _isPassive = false;
@@ -120,8 +140,29 @@ public class OpponentAI : MonoBehaviour
                 case OpponentAIState.Retreat:
                     Retreat();
                     break;
-                case OpponentAIState.Walk:
-                    Walk();
+                case OpponentAIState.WalkTowardsPlayer:
+                    WalkTowardsPlayer();
+                    break;
+                case OpponentAIState.WalkAwayFromPlayer:
+                    WalkAwayFromPlayer();
+                    break;
+                case OpponentAIState.JumpUp:
+                    JumpUp();
+                    break;
+                case OpponentAIState.JumpTowardsPlayer:
+                    JumpTowardsPlayer();
+                    break;
+                case OpponentAIState.JumpAwayFromPlayer:
+                    JumpAwayFromPlayer();
+                    break;
+                case OpponentAIState.ComeDown:
+                    ComeDown();
+                    break;
+                case OpponentAIState.ComeDownForward:
+                    ComeDownForward();
+                    break;
+                case OpponentAIState.ComeDownBackwards:
+                    ComeDownBackwards();
                     break;
                 case OpponentAIState.OpponentHitByLowPunch:
                     OpponentHitByLowPunch();
@@ -159,7 +200,7 @@ public class OpponentAI : MonoBehaviour
         _fightIntroFinished = FightIntro._fightIntroFinished;
         if (!_fightIntroFinished)
             return;
-
+        //Debug.Log("Idle deciding");
         if (_decideAggressionPriority < _passivePriority.start)
             _opponentAIState = OpponentAIState.Advance;
         if (_decideAggressionPriority > _passivePriority.end &&
@@ -169,7 +210,7 @@ public class OpponentAI : MonoBehaviour
 
             _isPassive = true;
             
-            StayPassive();
+            StartCoroutine("StayPassive");
         }
         if (_decideAggressionPriority == _defensivePriority.start)
             _opponentAIState = OpponentAIState.Retreat;
@@ -180,7 +221,7 @@ public class OpponentAI : MonoBehaviour
     private void Idle()
     {
         if (OpponentIsGrounded()) return;
-
+        //Debug.Log("Idling");
         _opponentMoveDirection = new Vector3(0, _opponentVerticalSpeed, 0);
 
         _opponentMoveDirection = _opponentTransform.TransformDirection(_opponentMoveDirection);
@@ -257,9 +298,9 @@ public class OpponentAI : MonoBehaviour
 
         _opponentAIState = OpponentAIState.OpponentIdle;
     }
-    private void Walk()
+    private void WalkTowardsPlayer()
     {
-        Debug.Log("called walk");
+       // Debug.Log("called walk");
         _opponentMoveDirection = (_playerPosition - transform.position) * _opponentWalkSpeed;
         _opponentMoveDirection.Normalize();
 
@@ -270,37 +311,136 @@ public class OpponentAI : MonoBehaviour
 
         OpponentWalkAnim();
     }
+    private void WalkAwayFromPlayer()
+    {
+        //Debug.Log("called walk");
+        _opponentMoveDirection = (transform.position - _playerPosition) * _opponentWalkSpeed;
+        _opponentMoveDirection.Normalize();
+
+        _opponentMoveDirection.y = 0;
+        _opponentMoveDirection.z = 0;
+
+        _collisionFlagsOpponent = _opponentController.Move(_opponentMoveDirection * Time.deltaTime);
+
+        OpponentWalkAnim();
+    }
+    private void JumpUp() 
+    {
+        OpponentJumpAnim();
+        _opponentMoveDirection = new Vector3(0, _opponentJumpSpeed, 0);
+        _opponentMoveDirection = _opponentTransform.TransformDirection(_opponentMoveDirection).normalized;
+        _opponentMoveDirection *= _opponentJumpSpeed;
+
+        _collisionFlagsOpponent = _opponentController.Move(_opponentMoveDirection * Time.deltaTime);
+
+        if (_opponentTransform.transform.position.y >= _jumpHeightTemp.y)
+        {
+            _opponentAIState = OpponentAIState.ComeDown;
+        }
+    }
+    private void JumpTowardsPlayer()
+    {
+        OpponentJumpAnim();
+
+        _opponentMoveDirection = new Vector3(-_opponentJumpHorizontal, _opponentVerticalSpeed, 0);
+        _opponentMoveDirection = _opponentTransform.TransformDirection(_opponentMoveDirection);
+        _opponentMoveDirection *= _opponentVerticalSpeed;
+
+        _collisionFlagsOpponent = _opponentController.Move(_opponentMoveDirection * Time.deltaTime);
+
+        if (_opponentTransform.transform.position.y >= _jumpHeightTemp.y)
+        {
+            _opponentAIState = OpponentAIState.ComeDownForward;
+        }
+    }
+    private void JumpAwayFromPlayer()
+    {
+        OpponentJumpAnim();
+
+        _opponentMoveDirection = new Vector3(_opponentJumpHorizontal, _opponentVerticalSpeed, 0);
+        _opponentMoveDirection = _opponentTransform.TransformDirection(_opponentMoveDirection);
+        _opponentMoveDirection *= _opponentVerticalSpeed;
+
+        _collisionFlagsOpponent = _opponentController.Move(_opponentMoveDirection * Time.deltaTime);
+
+        if (_opponentTransform.transform.position.y >= _jumpHeightTemp.y)
+        {
+            _opponentAIState = OpponentAIState.ComeDownBackwards;
+        }
+    }
+    private void ComeDown()
+    {
+        _opponentMoveDirection = new Vector3(0, _opponentVerticalSpeed, 0);
+        _opponentMoveDirection = _opponentTransform.TransformDirection(_opponentMoveDirection);
+
+        _collisionFlagsOpponent = _opponentController.Move(_opponentMoveDirection * Time.deltaTime);
+
+        if (OpponentIsGrounded())
+            _opponentAIState = OpponentAIState.OpponentIdle;
+    }
+    private void ComeDownForward()
+    {
+        _opponentMoveDirection = new Vector3(-_opponentJumpHorizontal, _opponentVerticalSpeed, 0);
+        _opponentMoveDirection = _opponentTransform.TransformDirection(_opponentMoveDirection);
+
+        _collisionFlagsOpponent = _opponentController.Move(_opponentMoveDirection * Time.deltaTime);
+
+        if (OpponentIsGrounded())
+            _opponentAIState = OpponentAIState.OpponentIdle;
+    }
+    private void ComeDownBackwards()
+    {
+        _opponentMoveDirection = new Vector3(_opponentJumpHorizontal, _opponentVerticalSpeed, 0);
+        _opponentMoveDirection = _opponentTransform.TransformDirection(_opponentMoveDirection);
+
+        _collisionFlagsOpponent = _opponentController.Move(_opponentMoveDirection * Time.deltaTime);
+
+        if (OpponentIsGrounded())
+            _opponentAIState = OpponentAIState.OpponentIdle;
+    }
     private void Advance()
     {
+        //Debug.Log("Advance deciding");
         //_opponentAIState = OpponentAIState.Attack;
         _decideMoveForwards = Random.Range(1, 10);
 
         if(_decideMoveForwards >= _minimumDecideValue && 
             _decideMoveForwards <= _tippingPointDecideValue)
         {
-
+            WalkAwayFromPlayer();
         }
         if (_decideMoveForwards <= _maximumDecideValue &&
             _decideMoveForwards <= _tippingPointDecideValue)
         {
+            WalkAwayFromPlayer();
 
         }
     }
-    private void StayPassive()
+    private IEnumerator StayPassive()
     {
         //_opponentAIState = OpponentAIState.StayPassive;
+        Debug.Log("Staying passive");
+
+        yield return new WaitForSeconds(_passiveTime);
+        _isPassive = false;
     }
     private void Retreat()
     {
+        //Debug.Log("Retreat deciding");
         //_opponentAIState = OpponentAIState.Retreat;
         _decideMoveBackwards = Random.Range(1, 10);
 
         if (_decideMoveBackwards >= _minimumDecideValue &&
             _decideMoveBackwards <= _tippingPointDecideValue)
         {
-
+            WalkAwayFromPlayer();
         }
-        
+
+        if (_decideMoveBackwards <= _maximumDecideValue &&
+            _decideMoveBackwards > _tippingPointDecideValue)
+        {
+            WalkAwayFromPlayer();
+        }
     }
     private void OpponentDefeated()
     {
@@ -327,8 +467,29 @@ public class OpponentAI : MonoBehaviour
     }
     private void OpponentWalkAnim()
     {
-        Debug.Log("reached animation");
+        //Debug.Log("reached animation");
         _opponentAnim.CrossFade(_opponentWalkAnim.name);
+    }
+    private void OpponentJumpAnim()
+    {
+        //Debug.Log("reached animation");
+        _opponentAnim.CrossFade(_opponentJumpAnim.name);
+    }
+    private void OpponentPunchHighAnim()
+    {
+        _opponentAnim.CrossFade(_opponentPunchHighAnim.name);
+    }
+    private void OpponentPunchLowAnim()
+    {
+        _opponentAnim.CrossFade(_opponentPunchLowAnim.name);
+    }
+    private void OpponentKickHighAnim()
+    {
+        _opponentAnim.CrossFade(_opponentKickHighAnim.name);
+    }
+    private void OpponentKickLowAnim()
+    {
+        _opponentAnim.CrossFade(_opponentKickLowAnim.name);
     }
     private void OpponentHitBodyAnim()
     {

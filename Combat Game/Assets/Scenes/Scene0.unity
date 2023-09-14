@@ -1138,6 +1138,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8068bb945d1ee634484bb74412acbf4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maximumPlayerHealth: 0
+  _currentPlayerHealth: 0
+  _playerHealthBarLength: 0
+  _maximumOpponentHealth: 0
+  _currentOpponentHealth: 0
+  _opponentHealthBarLength: 0
   _healthBarMinTexture: {fileID: 2800000, guid: 23455870c2dcc3f40832cf76d5a814b2, type: 3}
   _healthBarMaxTexture: {fileID: 2800000, guid: aaabfefff789aab43b238ccd853f95dc, type: 3}
   _fightGUIHeightPosition: 0
