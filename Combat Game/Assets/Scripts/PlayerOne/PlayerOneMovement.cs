@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static OpponentAI;
 
 public class PlayerOneMovement : MonoBehaviour
 {
     private Transform _playerOneTransform;
+    [SerializeField]
     private CharacterController _playerController;
 
     public static GameObject _playerOne;
@@ -50,7 +52,16 @@ public class PlayerOneMovement : MonoBehaviour
     public AnimationClip _playerOneIdleClip;
     public AnimationClip _playerWalkClip;
     public AnimationClip _playerJumpClip;
+    public AnimationClip _playerHitHeadClip;
+    public AnimationClip _playerHitBodyClip;
     public AnimationClip[] _playerAttackAnim;
+    public AnimationClip _playerDefeatedClip;
+
+    private AudioSource _playerAudioSource;
+    public AudioClip _playerHeadHitAudio;
+    public AudioClip _playerBodyHitAudio;
+
+    public GameObject _hitEffect;
 
     private bool _returnDemoState;
     private int _demoRotationValue = 500;
@@ -68,8 +79,9 @@ public class PlayerOneMovement : MonoBehaviour
         PlayerJump, PlayerJumpForwards, PlayerJumpBackwards,
         PlayerComeDown, PlayerComeDownForwards, PlayerComeDownBackwards,
         PlayerHighPunch, PlayerLowPunch, PlayerHighKick, PlayerLowKick,
-        WaitForAnimations, 
-        PlayerDemo
+        PlayerHitByHighPunch, PlayerHitByLowPunch, PlayerHitByHighKick, PlayerHitByLowKick,
+        WaitForAnimations, WaitForStrikeAnimations,
+        PlayerDemo, PlayerDefeated
     }
     private IEnumerator PlayerOneFSM()
     {
@@ -90,8 +102,14 @@ public class PlayerOneMovement : MonoBehaviour
                 case PlayerOneStates.PlayerLowPunch: PlayerLowPunch(); break;
                 case PlayerOneStates.PlayerHighKick: PlayerHighKick(); break;
                 case PlayerOneStates.PlayerLowKick: PlayerLowKick(); break;
+                case PlayerOneStates.PlayerHitByLowPunch: PlayerHitByLowPunch(); break;
+                case PlayerOneStates.PlayerHitByHighPunch: PlayerHitByHighPunch(); break;
+                case PlayerOneStates.PlayerHitByLowKick: PlayerHitByLowKick(); break;
+                case PlayerOneStates.PlayerHitByHighKick: PlayerHitByHighKick(); break;
                 case PlayerOneStates.WaitForAnimations: WaitForAnimations(); break;
+                case PlayerOneStates.WaitForStrikeAnimations: WaitForStrikeAnimations(); break;
                 case PlayerOneStates.PlayerDemo: PlayerDemo(); break;
+                case PlayerOneStates.PlayerDefeated: PlayerDefeated(); break;
             }
             yield return null;
         }
@@ -105,9 +123,10 @@ public class PlayerOneMovement : MonoBehaviour
         _jumpHeightTemp = new Vector3(0, _playerJumpHeight, 0);
         _playerSpeedYAxis = 0;
 
-        _playerController = GetComponent<CharacterController>();
+        //_playerController = GetComponent<CharacterController>();
 
          _playerOneAnim = GetComponent<Animation>();
+         _playerAudioSource = GetComponent<AudioSource>();
 
         for(int a = 0; a < _playerAttackAnim.Length; a++)
         {
@@ -154,6 +173,7 @@ public class PlayerOneMovement : MonoBehaviour
         UpdatePlayerPosition();
         UpdateOpponentPosition();
         UpdatePlayerRotation();
+        UpdatePlayerPlanePosition();
     }
 
     #region Player state methods
@@ -281,30 +301,90 @@ public class PlayerOneMovement : MonoBehaviour
         PlayerHighPunchAnim();
 
         _isPlayerPunchingHigh = true;
-        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForAnimations;
+        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForStrikeAnimations;
     }
     private void PlayerLowPunch()
     {
         PlayerLowPunchAnim();
 
         _isPlayerPunchingLow = true;
-        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForAnimations;
+        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForStrikeAnimations;
     }
     private void PlayerHighKick()
     {
         PlayerHighKickAnim();
 
         _isPlayerKickingHigh = true;
-        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForAnimations;
+        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForStrikeAnimations;
     }
     private void PlayerLowKick()
     {
         PlayerLowKickAnim();
 
         _isPlayerKickingLow = true;
-        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForAnimations;
+        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForStrikeAnimations;
     }
-    private void WaitForAnimations()
+    private void PlayerHitByLowPunch()
+    {
+        PlayerHitBodyAnim();
+
+        _playerAudioSource.PlayOneShot(_playerBodyHitAudio);
+
+        Vector3 _impactPoint = PlayerPunchLow._opponentImpactPoint;
+
+        GameObject _he = Instantiate(_hitEffect,
+            //_impactPoint,
+            new Vector3(_impactPoint.x - 0.6f, _impactPoint.y + 0.78f, _impactPoint.z - 0.6f),
+            Quaternion.identity) as GameObject;
+
+        _playerOneStates = PlayerOneStates.WaitForAnimations;
+    }
+    private void PlayerHitByHighPunch()
+    {
+        PlayerHitHeadAnim();
+
+        _playerAudioSource.PlayOneShot(_playerHeadHitAudio);
+
+        Vector3 _impactPoint = OpponentPunchHigh._playerImpactPoint;
+
+        GameObject _he = Instantiate(_hitEffect,
+            //_impactPoint,
+            new Vector3(_impactPoint.x - 0.6f, _impactPoint.y * -1.5f, _impactPoint.z - 0.6f),
+            Quaternion.identity) as GameObject;
+
+        _playerOneStates = PlayerOneStates.WaitForAnimations;
+    }
+    private void PlayerHitByLowKick()
+    {
+        PlayerHitBodyAnim();
+
+        _playerAudioSource.PlayOneShot(_playerBodyHitAudio);
+
+        Vector3 _impactPoint = OpponentKickLow._playerImpactPoint;
+
+        GameObject _he = Instantiate(_hitEffect,
+            //_impactPoint,
+            new Vector3(_impactPoint.x - 0.6f, _impactPoint.y + 0.78f, _impactPoint.z - 0.6f),
+            Quaternion.identity) as GameObject;
+
+        _playerOneStates = PlayerOneStates.WaitForAnimations;
+    }
+    private void PlayerHitByHighKick()
+    {
+        PlayerHitHeadAnim();
+
+        _playerAudioSource.PlayOneShot(_playerHeadHitAudio);
+
+        Vector3 _impactPoint = OpponentKickHigh._playerImpactPoint;
+
+        GameObject _he = Instantiate(_hitEffect,
+            //_impactPoint,
+            new Vector3(_impactPoint.x - 0.6f, _impactPoint.y + 0.78f, _impactPoint.z - 0.6f),
+            Quaternion.identity) as GameObject;
+
+        _playerOneStates = PlayerOneStates.WaitForAnimations;
+    }
+    private void WaitForStrikeAnimations()
     {
         for(int a = 0; a < _playerAttackAnim.Length; a++)
         {
@@ -317,7 +397,16 @@ public class PlayerOneMovement : MonoBehaviour
         _isPlayerKickingLow = false;
         _isPlayerKickingHigh = false;
 
-        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForAnimations; 
+        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForStrikeAnimations; 
+    }
+    private void WaitForAnimations()
+    {
+        if (_playerOneAnim.IsPlaying(_playerHitBodyClip.name))
+            return;
+        if (_playerOneAnim.IsPlaying(_playerHitHeadClip.name))
+            return;
+
+        _playerOneStates = PlayerOneStates.PlayerOneIdle;
     }
     private void PlayerDemo()
     {
@@ -332,6 +421,19 @@ public class PlayerOneMovement : MonoBehaviour
         {
             transform.Rotate(Vector3.down * _demoRotationValue * Time.deltaTime);
         }
+    }
+    private void PlayerDefeated()
+    {
+        _playerOneMoveDirection = new Vector3(0, _yAxis, 0);
+
+        _playerOneMoveDirection = _playerOneTransform.TransformDirection(_playerOneMoveDirection);
+
+        _collisionFlags = _playerController.Move(_playerOneMoveDirection * Time.deltaTime);
+
+        if (_playerOneAnim.IsPlaying(_playerDefeatedClip.name))
+            return;
+
+        StopCoroutine("PlayerOneFSM");
     }
     #endregion Player state methods
 
@@ -382,9 +484,21 @@ public class PlayerOneMovement : MonoBehaviour
     {
         _playerOneAnim.CrossFade(_playerAttackAnim[3].name);
     }
+    private void PlayerHitBodyAnim()
+    {
+        _playerOneAnim.CrossFade(_playerHitBodyClip.name);
+    }
+    private void PlayerHitHeadAnim()
+    {
+        _playerOneAnim.CrossFade(_playerHitHeadClip.name);
+    }
     private void PlayerDemoAnim()
     {
         _playerOneAnim.CrossFade(_playerOneIdleClip.name);
+    }
+    private void PlayerDefeatedAnim()
+    {
+        _playerOneAnim.CrossFade(_playerDefeatedClip.name);
     }
     #endregion Animation methods
 
@@ -464,6 +578,13 @@ public class PlayerOneMovement : MonoBehaviour
     }
     #endregion InputManagement
 
+    public void SetPlayerDefeated()
+    {
+        PlayerDefeatedAnim();
+        _playerOneStates = PlayerOneStates.PlayerDefeated;
+    }
+
+
     private void UpdatePlayerPosition()
     {
         _playerPosition = _playerOne.transform.position;
@@ -497,6 +618,12 @@ public class PlayerOneMovement : MonoBehaviour
                     _targetRotation, Time.deltaTime * _rotationSpeed);
             }
         }
+    }
+    private void UpdatePlayerPlanePosition()
+    {
+        if (_playerController.transform.position.z != GameManager._playerStartingPosition.z)
+            transform.position = new Vector3(transform.position.x,
+                transform.position.y, GameManager._opponentStartingPosition.z);
     }
 
     private void ApplyGravity()

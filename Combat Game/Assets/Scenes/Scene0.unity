@@ -1146,6 +1146,7 @@ MonoBehaviour:
   _opponentHealthBarLength: 0
   _healthBarMinTexture: {fileID: 2800000, guid: 23455870c2dcc3f40832cf76d5a814b2, type: 3}
   _healthBarMaxTexture: {fileID: 2800000, guid: aaabfefff789aab43b238ccd853f95dc, type: 3}
+  _healthBarOutlineTexture: {fileID: 2800000, guid: e137eaf840311684285d32ccac97690f, type: 3}
   _fightGUIHeightPosition: 0
 --- !u!1 &1812882790
 GameObject:

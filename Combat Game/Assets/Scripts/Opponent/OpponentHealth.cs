@@ -10,7 +10,6 @@ public class OpponentHealth : MonoBehaviour
 
     private bool _isOpponentDefeated; 
 
-    // Start is called before the first frame update
     void Start()
     {
         _currentOpponentHealth = _maximumOpponentHealth;
@@ -18,18 +17,60 @@ public class OpponentHealth : MonoBehaviour
 
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (_isOpponentDefeated) 
-            return;
+        
+            
+    }
 
+    public void OpponenLowPunchDamage(int _damageDealt)
+    {
+        if (_isOpponentDefeated)
+            return;
+        _currentOpponentHealth -= _damageDealt;
+
+        SendMessageUpwards("OpponentHitByLowPunch", SendMessageOptions.DontRequireReceiver);
+
+        CheckHealth();
+    }
+    public void OpponenHighPunchkDamage(int _damageDealt)
+    {
+        if (_isOpponentDefeated)
+            return;
+        _currentOpponentHealth -= _damageDealt;
+
+        SendMessageUpwards("OpponentHitByHighPunch", SendMessageOptions.DontRequireReceiver);
+
+        CheckHealth();
+    }
+    public void OpponenLowKickDamage(int _damageDealt)
+    {
+        if (_isOpponentDefeated)
+            return;
+        _currentOpponentHealth -= _damageDealt;
+
+        SendMessageUpwards("OpponentHitByLowKick", SendMessageOptions.DontRequireReceiver);
+
+        CheckHealth();
+    }
+    public void OpponenHighKickDamage(int _damageDealt)
+    {
+        if (_isOpponentDefeated)
+            return;
+        _currentOpponentHealth -= _damageDealt;
+
+        SendMessageUpwards("OpponentHitByHighKick", SendMessageOptions.DontRequireReceiver);
+
+        CheckHealth();
+    }
+
+    private void CheckHealth()
+    {
         if (_currentOpponentHealth <= _minimimOpponentHealth)
         {
             _currentOpponentHealth = _minimimOpponentHealth;
             _isOpponentDefeated = true;
             SendMessage("SetOpponentDefeated", SendMessageOptions.DontRequireReceiver);
         }
-            
     }
 }

@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    protected static Vector3 _playerStartingPosition = new Vector3(-3.26f, -0.65f, -6f);
-    protected static Vector3 _playerStartingRotation = new Vector3();
+    public static Vector3 _playerStartingPosition = new Vector3(-3.26f, -0.65f, -6f);
+    public static Vector3 _playerStartingRotation = new Vector3();
 
-    protected static Vector3 _opponentStartingPosition = new Vector3 (3.66f, -0.3f, -6f);
-    protected static Vector3 _opponentStartingRotation = new Vector3(0, 180, 0);
+    public static Vector3 _opponentStartingPosition = new Vector3 (3.66f, -0.3f, -6);
+    public static Vector3 _opponentStartingRotation = new Vector3(0, 180, 0);
 
     void Awake()
     {

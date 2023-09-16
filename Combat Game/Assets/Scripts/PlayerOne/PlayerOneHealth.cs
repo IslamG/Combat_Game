@@ -8,25 +8,66 @@ public class PlayerOneHealth : MonoBehaviour
     public static int _maximumPlayerHealth = 100;
     public static int _currentPlayerHealth;
 
+    private bool _isPlayerDefeated;
     void Start()
     {
         _currentPlayerHealth = _maximumPlayerHealth;
-        //_isOpponentDefeated = false;
+        _isPlayerDefeated = false;
 
     }
 
-    // Update is called once per frame
-    //void Update()
-    //{
-    //    if (_isOpponentDefeated)
-    //        return;
+    void PlayerLowPunchDamage(int _damageDealt)
+    {
+        if (_isPlayerDefeated)
+            return;
 
-    //    if (_currentPlayerHealth <= _minimimPlayerHealth)
-    //    {
-    //        _currentPlayerHealth = _minimimPlayerHealth;
-    //        _isOpponentDefeated = true;
-    //        SendMessage("SetOpponentDefeated", SendMessageOptions.DontRequireReceiver);
-    //    }
+        _currentPlayerHealth -= _damageDealt;
 
-    //}
+        SendMessageUpwards("PlayerHitByLowPunch", SendMessageOptions.DontRequireReceiver);
+
+        CheckHealth();
+    }
+    void PlayerHighPunchDamage(int _damageDealt)
+    {
+        if (_isPlayerDefeated)
+            return;
+
+        _currentPlayerHealth -= _damageDealt;
+
+        SendMessageUpwards("PlayerHitByHighPunch", SendMessageOptions.DontRequireReceiver);
+
+        CheckHealth();
+    }
+    void PlayerLowKickDamage(int _damageDealt)
+    {
+        if (_isPlayerDefeated)
+            return;
+
+        _currentPlayerHealth -= _damageDealt;
+
+        SendMessageUpwards("PlayerHitByLowKick", SendMessageOptions.DontRequireReceiver);
+
+        CheckHealth();
+    }
+    void PlayerHighKickDamage(int _damageDealt)
+    {
+        if (_isPlayerDefeated)
+            return;
+
+        _currentPlayerHealth -= _damageDealt;
+
+        SendMessageUpwards("PlayerHitByHighKick", SendMessageOptions.DontRequireReceiver);
+
+        CheckHealth();
+    }
+
+    private void CheckHealth()
+    {
+        if (_currentPlayerHealth <= _minimimPlayerHealth)
+        {
+            _currentPlayerHealth = _minimimPlayerHealth;
+            _isPlayerDefeated = true;
+            SendMessage("SetPlayerDefeated", SendMessageOptions.DontRequireReceiver);
+        }
+    }
 }

@@ -59,8 +59,16 @@ public class OnePlayerManager : GameManager
 
         _playerOneCharacter.GetComponent<PlayerOneMovement>().enabled = true;
         _playerOneCharacter.GetComponent<PlayerOneHealth>().enabled = true;
+        _playerOneCharacter.GetComponentInChildren<PlayerKickLow>().enabled = true;
+        _playerOneCharacter.GetComponentInChildren<PlayerKickHigh>().enabled = true;
+        _playerOneCharacter.GetComponentInChildren<PlayerPunchLow>().enabled = true;
+        _playerOneCharacter.GetComponentInChildren<PlayerPunchHigh>().enabled = true;
 
         _playerOneCharacter.GetComponent<OpponentAI>().enabled = false;
         _playerOneCharacter.GetComponent<OpponentHealth>().enabled = false;
+        _playerOneCharacter.GetComponentInChildren<OpponentKickLow>().enabled = false;
+        _playerOneCharacter.GetComponentInChildren<OpponentKickHigh>().enabled = false;
+        _playerOneCharacter.GetComponentInChildren<OpponentPunchLow>().enabled = false;
+        _playerOneCharacter.GetComponentInChildren<OpponentPunchHigh>().enabled = false;
     }
 }

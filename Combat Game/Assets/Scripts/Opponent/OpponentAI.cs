@@ -10,14 +10,21 @@ public class OpponentAI : MonoBehaviour
     public static GameObject _playerOne;
     public static GameObject _opponent;
 
+    public static bool _isOpponentPunchingLow;
+    public static bool _isOpponentPunchingHigh;
+    public static bool _isOpponentKickingLow;
+    public static bool _isOpponentKickingHigh;
+
     private Vector3 _playerPosition;
     private Vector3 _opponentPosition;
+    private Vector3 _positionDifference;
+    private float _positionDifferenceModifier = 5.0f;
 
     private Quaternion _targetRotation;
     private int _defaultRotation = 0;
     private int _alternativeRotation = 180;
     public float _rotationSpeed = 5f;
-    public float _opponentWalkSpeed = 1.0f;
+    private float _opponentWalkSpeed = 2.75f;
 
     private Animation _opponentAnim;
     public AnimationClip _opponentIdleAnim;
@@ -40,9 +47,9 @@ public class OpponentAI : MonoBehaviour
 
     private Vector3 _opponentMoveDirection = Vector3.zero;
 
-    public float _opponentJumpHeight = 0.5f;
-    public float _opponentJumpSpeed = 1;
-    public float _opponentJumpHorizontal = 1f;
+    private float _opponentJumpHeight = 1f;
+    private float _opponentJumpSpeed = 1;
+    private float _opponentJumpHorizontal = 3f;
     private Vector3 _jumpHeightTemp;
 
     private float _opponentGravity = 5f;
@@ -59,11 +66,22 @@ public class OpponentAI : MonoBehaviour
     private int _minimumDecideValue;
     private int _maximumDecideValue;
 
-    public int _tippingPointDecideValue = 1;
+    private int _tippingPointDecideValue = 1;
 
     private int _decideAggressionPriority;
     private bool _isPassive;
-    public float _passiveTime = 2;
+    private float _passiveTime = 2;
+
+    private ChooseAttack _chooseAttack;
+    private int _switchAttackValue;
+    private int _switchAttackStateValue;
+    private int _attackTypePivotValue;
+    private float _attackDistanceModifier = 1.75f;
+
+    public int _lowPunchRangeMin, _lowPunchRangeMax;
+    public int _highPunchRangeMin, _highPunchRangeMax;
+    public int _lowKickRangeMin, _lowKickRangeMax;
+    public int _highKickRangeMin, _highKickRangeMax;
 
     private bool _fightIntroFinished;
 
@@ -73,25 +91,54 @@ public class OpponentAI : MonoBehaviour
 
     public enum OpponentAIState
     {
-        Initialize,
-        OpponentIdle, 
-        Advance,
-        StayPassive,
-        Retreat,
-        WalkTowardsPlayer,
-        WalkAwayFromPlayer,
-        JumpUp, 
-        JumpTowardsPlayer, 
-        JumpAwayFromPlayer,
-        ComeDown, 
-        ComeDownForward, 
-        ComeDownBackwards,
-        OpponentHitByLowPunch, 
-        OpponentHitByHighPunch,
-        OpponentHitByLowKick,
-        OpponentHitByHighKick,
-        WaitForAnimations,
+        Initialize, OpponentIdle, 
+        Advance, StayPassive, Retreat,
+        WalkTowardsPlayer,  WalkAwayFromPlayer,
+        JumpUp, JumpTowardsPlayer, JumpAwayFromPlayer,
+        ComeDown, ComeDownForward, ComeDownBackwards,
+        OpponentHitByLowPunch, OpponentHitByHighPunch, OpponentHitByLowKick, OpponentHitByHighKick,
+        OpponentLowPunch, OpponentHighPunch, OpponentLowKick, OpponentHighKick,
+        ChooseAttackState, 
+        WaitForAnimations, WaitForStrikeAnimations, 
         OpponentDefeated
+    }
+    private enum ChooseAttack
+    {
+        LowPunch, HighPunch, LowKick, HighKick
+    }
+    private IEnumerator OpponentFSM()
+    {
+        while (true)
+        {
+            switch (_opponentAIState)
+            {
+                case OpponentAIState.Initialize: Initialize(); break;
+                case OpponentAIState.OpponentIdle: OpponentIdle(); break;
+                case OpponentAIState.Advance: Advance(); break;
+                case OpponentAIState.Retreat: Retreat(); break;
+                case OpponentAIState.WalkTowardsPlayer: WalkTowardsPlayer(); break;
+                case OpponentAIState.WalkAwayFromPlayer: WalkAwayFromPlayer(); break;
+                case OpponentAIState.JumpUp: JumpUp(); break;
+                case OpponentAIState.JumpTowardsPlayer: JumpTowardsPlayer(); break;
+                case OpponentAIState.JumpAwayFromPlayer: JumpAwayFromPlayer(); break;
+                case OpponentAIState.ComeDown: ComeDown(); break;
+                case OpponentAIState.ComeDownForward: ComeDownForward(); break;
+                case OpponentAIState.ComeDownBackwards: ComeDownBackwards(); break;
+                case OpponentAIState.OpponentHitByLowPunch: OpponentHitByLowPunch(); break;
+                case OpponentAIState.OpponentHitByHighPunch: OpponentHitByHighPunch(); break;
+                case OpponentAIState.OpponentHitByLowKick: OpponentHitByLowKick(); break;
+                case OpponentAIState.OpponentHitByHighKick: OpponentHitByHighKick(); break;
+                case OpponentAIState.OpponentLowPunch: OpponentLowPunch(); break;
+                case OpponentAIState.OpponentHighPunch: OpponentHighPunch(); break;
+                case OpponentAIState.OpponentLowKick: OpponentLowKick(); break;
+                case OpponentAIState.OpponentHighKick: OpponentHighKick(); break;
+                case OpponentAIState.ChooseAttackState: ChooseAttackState(); break;
+                case OpponentAIState.WaitForAnimations: WaitForAnimations(); break;
+                case OpponentAIState.WaitForStrikeAnimations: WaitForStrikeAnimations(); break;
+                case OpponentAIState.OpponentDefeated: OpponentDefeated(); break;
+            }
+            yield return null;
+        }
     }
 
     private void Start()
@@ -120,76 +167,37 @@ public class OpponentAI : MonoBehaviour
         UpdatePlayerPosition();
         UpdateOpponentPosition();
         UpdateOpponentRotation();
-    }
-    
-    private IEnumerator OpponentFSM()
-    {
-        while (true)
-        {
-            switch (_opponentAIState)
-            {
-                case OpponentAIState.Initialize:
-                    Initialize();
-                    break;
-                case OpponentAIState.OpponentIdle:
-                    OpponentIdle();
-                    break;
-                case OpponentAIState.Advance:
-                    Advance();
-                    break;
-                case OpponentAIState.Retreat:
-                    Retreat();
-                    break;
-                case OpponentAIState.WalkTowardsPlayer:
-                    WalkTowardsPlayer();
-                    break;
-                case OpponentAIState.WalkAwayFromPlayer:
-                    WalkAwayFromPlayer();
-                    break;
-                case OpponentAIState.JumpUp:
-                    JumpUp();
-                    break;
-                case OpponentAIState.JumpTowardsPlayer:
-                    JumpTowardsPlayer();
-                    break;
-                case OpponentAIState.JumpAwayFromPlayer:
-                    JumpAwayFromPlayer();
-                    break;
-                case OpponentAIState.ComeDown:
-                    ComeDown();
-                    break;
-                case OpponentAIState.ComeDownForward:
-                    ComeDownForward();
-                    break;
-                case OpponentAIState.ComeDownBackwards:
-                    ComeDownBackwards();
-                    break;
-                case OpponentAIState.OpponentHitByLowPunch:
-                    OpponentHitByLowPunch();
-                    break;
-                case OpponentAIState.OpponentHitByHighPunch:
-                    OpponentHitByHighPunch();
-                    break;
-                case OpponentAIState.OpponentHitByLowKick:
-                    OpponentHitByLowKick();
-                    break;
-                case OpponentAIState.OpponentHitByHighKick:
-                    OpponentHitByHighKick();
-                    break;
-                case OpponentAIState.WaitForAnimations:
-                    WaitForAnimations();
-                    break;
-                case OpponentAIState.OpponentDefeated:
-                    OpponentDefeated();
-                    break;
-            }
-            yield return null;
-        }
+        UpdatePositionDifference();
+        UpdateOpponentPlanePosition();
     }
 
     private void Initialize()
     {
         _decideAggressionPriority = Random.Range(1, 9);
+        
+        if(_attackTypePivotValue == 0)
+            _attackTypePivotValue = 3;
+        
+        //if (_lowPunchRangeMin != 0)
+        //    _lowPunchRangeMin = 0;
+        //if (_lowPunchRangeMax == 0)
+        //    _lowPunchRangeMax = 1;
+
+        //if (_highPunchRangeMin == 0)
+        //    _highPunchRangeMin = 2;
+        //if (_highPunchRangeMax == 0)
+        //    _highPunchRangeMax = 3;
+
+        //if (_lowKickRangeMin == 0)
+        //    _lowKickRangeMin = 4;
+        //if (_lowKickRangeMax == 0)
+        //    _lowKickRangeMax = 5;
+
+        //if (_highKickRangeMin == 0)
+        //    _highKickRangeMin = 6;
+        //if (_highKickRangeMax == 0)
+        //    _highKickRangeMax = 7;
+
         _opponentAIState = OpponentAIState.OpponentIdle;
     }
     private void OpponentIdle()
@@ -289,6 +297,64 @@ public class OpponentAI : MonoBehaviour
 
         _opponentAIState = OpponentAIState.WaitForAnimations;
     }
+    private void ChooseAttackState()
+    {
+        OpponentIdleAnim();
+
+        _switchAttackValue = Random.Range(0, 7);
+
+        if (_switchAttackValue >= _lowPunchRangeMin && _switchAttackValue <= _lowPunchRangeMax)
+            _switchAttackStateValue = 0;
+
+        if (_switchAttackValue >= _highPunchRangeMin && _switchAttackValue <= _highPunchRangeMax)
+            _switchAttackStateValue = 1;
+
+        if (_switchAttackValue >= _lowKickRangeMin && _switchAttackValue <= _lowKickRangeMax)
+            _switchAttackStateValue = 2;
+
+        if (_switchAttackValue >= _highKickRangeMin && _switchAttackValue <= _highKickRangeMax)
+            _switchAttackStateValue = 3;
+
+        switch (_switchAttackStateValue)
+        {
+            case 0: _chooseAttack = ChooseAttack.LowPunch; break;
+            case 1: _chooseAttack = ChooseAttack.HighPunch; break;
+            case 2: _chooseAttack = ChooseAttack.LowKick; break;
+            case 3: _chooseAttack = ChooseAttack.HighKick; break;
+        }
+
+        if (_chooseAttack == ChooseAttack.LowPunch)
+            _opponentAIState = OpponentAIState.OpponentLowPunch;
+        if (_chooseAttack == ChooseAttack.HighPunch)
+            _opponentAIState = OpponentAIState.OpponentHighPunch;
+        if (_chooseAttack == ChooseAttack.LowKick)
+            _opponentAIState = OpponentAIState.OpponentLowKick;
+        if (_chooseAttack == ChooseAttack.HighKick)
+            _opponentAIState = OpponentAIState.OpponentHighKick;
+    }
+    private void OpponentLowPunch()
+    {
+        OpponentPunchLowAnim();
+        _opponentAIState = OpponentAIState.WaitForStrikeAnimations;
+    }
+    private void OpponentHighPunch()
+    {
+        OpponentPunchHighAnim();
+        _opponentAIState = OpponentAIState.WaitForStrikeAnimations;
+
+    }
+    private void OpponentLowKick()
+    {
+        OpponentKickHighAnim();
+        _opponentAIState = OpponentAIState.WaitForStrikeAnimations;
+
+    }
+    private void OpponentHighKick()
+    {
+        OpponentKickLowAnim();
+        _opponentAIState = OpponentAIState.WaitForStrikeAnimations;
+
+    }
     private void WaitForAnimations()
     {
         if (_opponentAnim.IsPlaying(_opponentHitBodyAnim.name))
@@ -298,9 +364,30 @@ public class OpponentAI : MonoBehaviour
 
         _opponentAIState = OpponentAIState.OpponentIdle;
     }
+    private void WaitForStrikeAnimations()
+    {
+        if (_opponentAnim.IsPlaying(_opponentPunchLowAnim.name))
+            return;
+        if (_opponentAnim.IsPlaying(_opponentPunchHighAnim.name))
+            return;
+        if (_opponentAnim.IsPlaying(_opponentKickLowAnim.name))
+            return;
+        if (_opponentAnim.IsPlaying(_opponentKickHighAnim.name))
+            return;
+
+        _isOpponentPunchingLow = false;
+        _isOpponentPunchingHigh = false;
+        _isOpponentKickingLow = false;
+        _isOpponentKickingHigh = false;
+
+        _opponentAIState = OpponentAIState.OpponentIdle;
+    }
     private void WalkTowardsPlayer()
     {
-       // Debug.Log("called walk");
+        if (Mathf.Abs(_playerOne.transform.position.x - _opponent.transform.position.x) 
+            <= _attackDistanceModifier)
+            _opponentAIState = OpponentAIState.ChooseAttackState;
+
         _opponentMoveDirection = (_playerPosition - transform.position) * _opponentWalkSpeed;
         _opponentMoveDirection.Normalize();
 
@@ -407,13 +494,14 @@ public class OpponentAI : MonoBehaviour
         if(_decideMoveForwards >= _minimumDecideValue && 
             _decideMoveForwards <= _tippingPointDecideValue)
         {
-            WalkAwayFromPlayer();
+            _opponentAIState = OpponentAIState.WalkTowardsPlayer;
         }
         if (_decideMoveForwards <= _maximumDecideValue &&
-            _decideMoveForwards <= _tippingPointDecideValue)
+            _decideMoveForwards >= _tippingPointDecideValue)
         {
-            WalkAwayFromPlayer();
-
+            _opponentAIState = _positionDifference.x >= _positionDifferenceModifier ?
+                OpponentAIState.JumpTowardsPlayer : OpponentAIState.WalkTowardsPlayer;
+                 
         }
     }
     private IEnumerator StayPassive()
@@ -455,7 +543,7 @@ public class OpponentAI : MonoBehaviour
 
         StopCoroutine("OpponentFSM");
     }
-    private void SetOpponentDefeated()
+    public void SetOpponentDefeated()
     {
         OpponentDefeatedAnim();
         _opponentAIState = OpponentAIState.OpponentDefeated;
@@ -512,6 +600,14 @@ public class OpponentAI : MonoBehaviour
     {
         _opponentPosition = _opponent.transform.position;
     }
+    private void UpdatePositionDifference()
+    {
+        if (_playerOne.transform.position.x < _opponent.transform.position.x)
+            _positionDifference = _opponentPosition - _playerPosition;
+
+        if (_playerOne.transform.position.x > _opponent.transform.position.x)
+            _positionDifference =  _playerPosition - _opponentPosition;
+    }
     private void UpdateOpponentRotation()
     {
         if (_playerPosition.x > _opponentPosition.x)
@@ -537,6 +633,12 @@ public class OpponentAI : MonoBehaviour
                     _targetRotation, Time.deltaTime * _rotationSpeed);
             }
         }
+    }
+    private void UpdateOpponentPlanePosition()
+    {
+        if (_opponentController.transform.position.z != GameManager._opponentStartingPosition.z)
+            transform.position = new Vector3(transform.position.x,
+                transform.position.y, GameManager._opponentStartingPosition.z);
     }
 
     void ApplyOpponentGravity()

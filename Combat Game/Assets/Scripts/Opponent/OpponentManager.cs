@@ -82,20 +82,27 @@ public class OpponentManager : GameManager
 
         //Debug.Log("op character " + _currentOpponent);
 
-        FightCamera._opponent = _currentOpponent;
-        OpponentAI._opponent = _currentOpponent;
-        PlayerOneMovement._opponent = _currentOpponent;
-
-
-        _currentOpponent.GetComponent<PlayerOneMovement>().enabled = false;
-        _currentOpponent.GetComponent<PlayerOneHealth>().enabled = false;
-
-        _currentOpponent.GetComponent<OpponentAI>().enabled = true;
-        _currentOpponent.GetComponent<OpponentHealth>().enabled = true;
+        SetOpponent();
     }
 
     private void SetOpponent()
     {
+        FightCamera._opponent = _currentOpponent;
+        OpponentAI._opponent = _currentOpponent;
+        PlayerOneMovement._opponent = _currentOpponent;
 
+        _currentOpponent.GetComponent<PlayerOneMovement>().enabled = false;
+        _currentOpponent.GetComponent<PlayerOneHealth>().enabled = false;
+        _currentOpponent.GetComponentInChildren<PlayerKickLow>().enabled = false;
+        _currentOpponent.GetComponentInChildren<PlayerKickHigh>().enabled = false;
+        _currentOpponent.GetComponentInChildren<PlayerPunchLow>().enabled = false;
+        _currentOpponent.GetComponentInChildren<PlayerPunchHigh>().enabled = false;
+
+        _currentOpponent.GetComponent<OpponentAI>().enabled = true;
+        _currentOpponent.GetComponent<OpponentHealth>().enabled = true;
+        _currentOpponent.GetComponentInChildren<OpponentKickLow>().enabled = true;
+        _currentOpponent.GetComponentInChildren<OpponentKickHigh>().enabled = true;
+        _currentOpponent.GetComponentInChildren<OpponentPunchLow>().enabled = true;
+        _currentOpponent.GetComponentInChildren<OpponentPunchHigh>().enabled = true;
     }
 }
