@@ -284,9 +284,9 @@ public class OpponentAI : MonoBehaviour
     }
     private void OpponentHitByHighKick()
     {
-        OpponentHitHeadAnim();
+        OpponentHitBodyAnim();
 
-        _opponentAIAudioSource.PlayOneShot(_opponentHeadHitAudio);
+        _opponentAIAudioSource.PlayOneShot(_opponentBodyHitAudio);
 
         Vector3 _impactPoint = PlayerKickHigh._opponentImpactPoint;
 

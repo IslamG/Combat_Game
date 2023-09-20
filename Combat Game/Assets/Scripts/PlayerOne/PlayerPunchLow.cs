@@ -22,12 +22,16 @@ public class PlayerPunchLow : MonoBehaviour
     private void Update()
     {
         _isPlayerPunchingLow = PlayerOneMovement._isPlayerPunchingLow;
-        _hitCollider.enabled = _isPlayerPunchingLow;
+        _hitCollider.enabled = _isPlayerPunchingLow || PlayerOneMovement._isPlayerPunchingHigh;
     }
 
     void OnTriggerStay(Collider _opponentBodyHit)
     {
-        if (_opponentBodyHit.CompareTag("BodyHitBox") && Time.time >= _nextPunchIsAllowed)
+        //if (_isPlayerPunchingLow) return;
+
+        if (_opponentBodyHit.CompareTag("BodyHitBox") 
+            && _isPlayerPunchingLow
+            && Time.time >= _nextPunchIsAllowed)
         {
             BodyPunch();
             _nextPunchIsAllowed = Time.time + _attackDelay;
@@ -41,6 +45,10 @@ public class PlayerPunchLow : MonoBehaviour
     {
         Debug.Log("Hit body with low punch");
         OpponentAI._opponentAIState = OpponentAI.OpponentAIState.OpponentHitByLowPunch;
+
+        OpponentHealth _tempDamage = FightCamera._opponent.GetComponent<OpponentHealth>();
+
+        _tempDamage.OpponentLowPunchDamage(_lowPunchDamageValue);
     }
 
     private void LowPunchDamageSetUp()

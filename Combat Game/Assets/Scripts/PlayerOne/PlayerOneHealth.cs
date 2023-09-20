@@ -16,7 +16,7 @@ public class PlayerOneHealth : MonoBehaviour
 
     }
 
-    void PlayerLowPunchDamage(int _damageDealt)
+    public void PlayerLowPunchDamage(int _damageDealt)
     {
         if (_isPlayerDefeated)
             return;
@@ -27,7 +27,7 @@ public class PlayerOneHealth : MonoBehaviour
 
         CheckHealth();
     }
-    void PlayerHighPunchDamage(int _damageDealt)
+    public void PlayerHighPunchDamage(int _damageDealt)
     {
         if (_isPlayerDefeated)
             return;
@@ -38,7 +38,7 @@ public class PlayerOneHealth : MonoBehaviour
 
         CheckHealth();
     }
-    void PlayerLowKickDamage(int _damageDealt)
+    public void PlayerLowKickDamage(int _damageDealt)
     {
         if (_isPlayerDefeated)
             return;
@@ -49,7 +49,7 @@ public class PlayerOneHealth : MonoBehaviour
 
         CheckHealth();
     }
-    void PlayerHighKickDamage(int _damageDealt)
+    public void PlayerHighKickDamage(int _damageDealt)
     {
         if (_isPlayerDefeated)
             return;

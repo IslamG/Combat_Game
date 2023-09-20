@@ -23,7 +23,7 @@ public class OpponentHealth : MonoBehaviour
             
     }
 
-    public void OpponenLowPunchDamage(int _damageDealt)
+    public void OpponentLowPunchDamage(int _damageDealt)
     {
         if (_isOpponentDefeated)
             return;
@@ -33,7 +33,7 @@ public class OpponentHealth : MonoBehaviour
 
         CheckHealth();
     }
-    public void OpponenHighPunchkDamage(int _damageDealt)
+    public void OpponentHighPunchDamage(int _damageDealt)
     {
         if (_isOpponentDefeated)
             return;
@@ -43,7 +43,7 @@ public class OpponentHealth : MonoBehaviour
 
         CheckHealth();
     }
-    public void OpponenLowKickDamage(int _damageDealt)
+    public void OpponentLowKickDamage(int _damageDealt)
     {
         if (_isOpponentDefeated)
             return;
@@ -53,7 +53,7 @@ public class OpponentHealth : MonoBehaviour
 
         CheckHealth();
     }
-    public void OpponenHighKickDamage(int _damageDealt)
+    public void OpponentHighKickDamage(int _damageDealt)
     {
         if (_isOpponentDefeated)
             return;

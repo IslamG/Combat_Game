@@ -10,22 +10,28 @@ public class PlayerPunchHigh : MonoBehaviour
     public float _attackDelay = 1f;
 
     private Collider _hitCollider;
-    private bool _isPlayerPunchingHigh; 
+    private bool _isPlayerPunchingHigh;
+    private int _highPunchDamageValue;
 
     private void Start()
     {
         _opponentImpactPoint = Vector3.zero;
         _hitCollider = GetComponent<Collider>();
         _hitCollider.enabled = false;
+        HighPunchDamageSetUp();
     }
     private void Update()
     {
         _isPlayerPunchingHigh = PlayerOneMovement._isPlayerPunchingHigh;
-        _hitCollider.enabled = _isPlayerPunchingHigh;
+        _hitCollider.enabled = _isPlayerPunchingHigh || PlayerOneMovement._isPlayerPunchingLow;
     }
     void OnTriggerStay(Collider _opponentHeadHit)
     {
-        if (_opponentHeadHit.CompareTag("HeadHitBox") && Time.time >= _nextPunchIsAllowed)
+        //if (_isPlayerPunchingHigh) return;
+
+        if (_opponentHeadHit.CompareTag("HeadHitBox")
+            && _isPlayerPunchingHigh
+            && Time.time >= _nextPunchIsAllowed)
         {
             HeadPunch();
             _nextPunchIsAllowed = Time.time + _attackDelay;
@@ -40,5 +46,14 @@ public class PlayerPunchHigh : MonoBehaviour
 
         Debug.Log("Hit head with high punch");
         OpponentAI._opponentAIState = OpponentAI.OpponentAIState.OpponentHitByHighPunch;
+
+        OpponentHealth _tempDamage = FightCamera._opponent.GetComponent<OpponentHealth>();
+
+        _tempDamage.OpponentHighPunchDamage(_highPunchDamageValue);
+    }
+
+    private void HighPunchDamageSetUp()
+    {
+        _highPunchDamageValue = GetComponentInParent<CharacterStats>()._highPunchDamage;
     }
 }

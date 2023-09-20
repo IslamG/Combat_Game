@@ -300,6 +300,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3829270b62f6ab94daf378d6010cb4a2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6976897764410075852}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3829270b62f6ab94daf378d6010cb4a2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2174604093764204084}
     - targetCorrespondingSourceObject: {fileID: -7926544154110595155, guid: 3829270b62f6ab94daf378d6010cb4a2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6001060885918599781}
@@ -724,3 +727,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2174604093764204084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6817168804599760287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce791859c184d6249aa2627a70c09a56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _lowPunchDamage: 5
+  _highPunchDamage: 7
+  _lowKickDamage: 3
+  _highKickDamage: 9

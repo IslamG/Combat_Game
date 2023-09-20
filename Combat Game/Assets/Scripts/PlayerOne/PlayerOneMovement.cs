@@ -71,9 +71,9 @@ public class PlayerOneMovement : MonoBehaviour
     private Vector3 _playerOneMoveDirection = Vector3.zero;
     private CollisionFlags _collisionFlags;
 
-    private PlayerOneStates _playerOneStates;
+    public PlayerOneStates _playerOneStates;
 
-    private enum PlayerOneStates
+    public enum PlayerOneStates
     {
         PlayerOneIdle, PlayerWalkLeft, PlayerWalkRight, 
         PlayerJump, PlayerJumpForwards, PlayerJumpBackwards,
