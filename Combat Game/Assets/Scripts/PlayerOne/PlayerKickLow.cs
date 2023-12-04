@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class PlayerKickLow : MonoBehaviour
 {
-    public static Vector3 _opponentImpactPoint;
+    //public static Vector3 _opponentImpactPoint;
+
     private Collider _hitCollider;
     private bool _isPlayerKickingLow;
 
@@ -14,7 +15,7 @@ public class PlayerKickLow : MonoBehaviour
     private int _lowKickDamageValue;
     private void Start()
     {
-        _opponentImpactPoint = Vector3.zero;
+        //_opponentImpactPoint = Vector3.zero;
         _hitCollider = GetComponent<Collider>();
         _hitCollider.enabled = false;
         LowKickDamageSetUp();
@@ -37,8 +38,8 @@ public class PlayerKickLow : MonoBehaviour
             _nextKickIsAllowed = Time.time + _attackDelay;
         }
 
-        _opponentBodyHit.ClosestPointOnBounds(transform.position);
-        _opponentImpactPoint = _opponentBodyHit.transform.position;
+        //_opponentBodyHit.ClosestPointOnBounds(transform.position);
+        //_opponentImpactPoint = _opponentBodyHit.transform.position;
     }
 
     void BodyKick()

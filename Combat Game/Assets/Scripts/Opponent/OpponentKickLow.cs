@@ -4,7 +4,7 @@ using UnityEngine;
    
 public class OpponentKickLow : MonoBehaviour
 {
-    public static Vector3 _playerImpactPoint;
+    //public static Vector3 _playerImpactPoint;
 
     public float _nextKickIsAllowed = -1f;
     public float _attackDelay = 1f;
@@ -18,7 +18,7 @@ public class OpponentKickLow : MonoBehaviour
 
     private void Start()
     {
-        _playerImpactPoint = Vector3.zero;
+        //_playerImpactPoint = Vector3.zero;
         _hitCollider = GetComponent<Collider>();
         _hitCollider.enabled = false;
        
@@ -40,8 +40,8 @@ public class OpponentKickLow : MonoBehaviour
             _nextKickIsAllowed = Time.time + _attackDelay;
         }
 
-        _playerBodyHit.ClosestPointOnBounds(transform.position);
-        _playerImpactPoint = _playerBodyHit.transform.position;
+        //_playerBodyHit.ClosestPointOnBounds(transform.position);
+        //_playerImpactPoint = _playerBodyHit.transform.position;
     }
     private void LowKickDamageSetUp()
     {
@@ -50,10 +50,10 @@ public class OpponentKickLow : MonoBehaviour
     void BodyKick()
     {
         Debug.Log("Hit body");
-        _playerOneMovement._playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerHitByLowKick;
 
         _playerOne = FightCamera._playerOne;
         _playerOneMovement = _playerOne.GetComponent<PlayerOneMovement>();
+        _playerOneMovement._playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerHitByLowKick;
 
         PlayerOneHealth _tempDamage = _playerOne.GetComponent<PlayerOneHealth>();
 

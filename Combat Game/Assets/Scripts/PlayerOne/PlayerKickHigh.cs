@@ -4,16 +4,19 @@ using UnityEngine;
 
 public class PlayerKickHigh : MonoBehaviour
 {
-    public static Vector3 _opponentImpactPoint;
+    //public static Vector3 _opponentImpactPoint;
+
     private Collider _hitCollider;
     private bool _isPlayerKickingHigh;
+
     public float _nextKickIsAllowed = -1f;
     public float _attackDelay = 1f;
+
     private int _highKickDamageValue;
 
     private void Start()
     {
-        _opponentImpactPoint = Vector3.zero;
+        //_opponentImpactPoint = Vector3.zero;
         _hitCollider = GetComponent<Collider>();
         _hitCollider.enabled = false;
         HighKickDamageSetUp();
@@ -36,8 +39,8 @@ public class PlayerKickHigh : MonoBehaviour
             _nextKickIsAllowed = Time.time + _attackDelay;
         }
 
-        _opponentHeadHit.ClosestPointOnBounds(transform.position);
-        _opponentImpactPoint = _opponentHeadHit.transform.position;
+        //_opponentHeadHit.ClosestPointOnBounds(transform.position);
+        //_opponentImpactPoint = _opponentHeadHit.transform.position;
     }
 
     void HeadKick()

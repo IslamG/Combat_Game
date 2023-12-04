@@ -4,7 +4,8 @@ using UnityEngine;
      
 public class OpponentKickHigh : MonoBehaviour
 {
-    public static Vector3 _playerImpactPoint;
+    //public static Vector3 _playerImpactPoint;
+
     public float _nextKickIsAllowed = -1f;
     public float _attackDelay = 1f;
 
@@ -17,7 +18,8 @@ public class OpponentKickHigh : MonoBehaviour
 
     private void Start()
     {
-        _playerImpactPoint = Vector3.zero;
+        
+        //_playerImpactPoint = Vector3.zero;
         _hitCollider = GetComponent<Collider>();
         _hitCollider.enabled = false;
         
@@ -39,8 +41,8 @@ public class OpponentKickHigh : MonoBehaviour
             _nextKickIsAllowed = Time.time + _attackDelay;
         }
 
-        _playerHeadHit.ClosestPointOnBounds(transform.position);
-        _playerImpactPoint = _playerHeadHit.transform.position;
+        //_playerHeadHit.ClosestPointOnBounds(transform.position);
+        //_playerImpactPoint = _playerHeadHit.transform.position;
     }
     private void HighKickDamageSetUp()
     {
@@ -49,9 +51,12 @@ public class OpponentKickHigh : MonoBehaviour
     void HeadKick()
     {
         Debug.Log("Hit body");
-        _playerOne = FightCamera._playerOne;
-        _playerOneMovement = _playerOne.GetComponent<PlayerOneMovement>();
+        
 
+
+        _playerOne = FightCamera._playerOne;
+        Debug.Log("player one  being hit2 " + _playerOne);
+        _playerOneMovement = _playerOne.GetComponent<PlayerOneMovement>();
         _playerOneMovement._playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerHitByHighKick;
 
         PlayerOneHealth _tempDamage = _playerOne.GetComponent<PlayerOneHealth>();

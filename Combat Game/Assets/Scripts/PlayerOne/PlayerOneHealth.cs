@@ -8,14 +8,21 @@ public class PlayerOneHealth : MonoBehaviour
     public static int _maximumPlayerHealth = 100;
     public static int _currentPlayerHealth;
 
+    private GameObject _opponentObj;
+
     private bool _isPlayerDefeated;
     void Start()
     {
         _currentPlayerHealth = _maximumPlayerHealth;
         _isPlayerDefeated = false;
-
+        _opponentObj = FightCamera._opponent;
     }
 
+    void Update()
+    {
+        if (_currentPlayerHealth == 0)
+            _opponentObj.gameObject.SendMessage("PlayerDefeated");
+    }
     public void PlayerLowPunchDamage(int _damageDealt)
     {
         if (_isPlayerDefeated)

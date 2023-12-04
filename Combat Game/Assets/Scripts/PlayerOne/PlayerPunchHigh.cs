@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerPunchHigh : MonoBehaviour
 {
-    public static Vector3 _opponentImpactPoint;
+    //public static Vector3 _opponentImpactPoint;
 
     public float _nextPunchIsAllowed = -1f;
     public float _attackDelay = 1f;
@@ -15,7 +15,7 @@ public class PlayerPunchHigh : MonoBehaviour
 
     private void Start()
     {
-        _opponentImpactPoint = Vector3.zero;
+        //_opponentImpactPoint = Vector3.zero;
         _hitCollider = GetComponent<Collider>();
         _hitCollider.enabled = false;
         HighPunchDamageSetUp();
@@ -37,8 +37,8 @@ public class PlayerPunchHigh : MonoBehaviour
             _nextPunchIsAllowed = Time.time + _attackDelay;
         }
 
-        _opponentHeadHit.ClosestPointOnBounds(transform.position);
-        _opponentImpactPoint = _opponentHeadHit.transform.position;
+        //_opponentHeadHit.ClosestPointOnBounds(transform.position);
+        //_opponentImpactPoint = _opponentHeadHit.transform.position;
     }
 
     void HeadPunch()

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 public class PlayerPunchLow : MonoBehaviour
 {
-    public static Vector3 _opponentImpactPoint;
+   // public static Vector3 _opponentImpactPoint;
+
     private Collider _hitCollider;
     private bool _isPlayerPunchingLow;
+
     public float _nextPunchIsAllowed = -1f;
     public float _attackDelay = 1f;
 
@@ -13,7 +15,7 @@ public class PlayerPunchLow : MonoBehaviour
 
     private void Start()
     {
-        _opponentImpactPoint = Vector3.zero;
+        //_opponentImpactPoint = Vector3.zero;
         _hitCollider = GetComponent<Collider>();
         _hitCollider.enabled = false;
 
@@ -37,8 +39,8 @@ public class PlayerPunchLow : MonoBehaviour
             _nextPunchIsAllowed = Time.time + _attackDelay;
         };
 
-        _opponentBodyHit.ClosestPointOnBounds(transform.position);
-        _opponentImpactPoint = _opponentBodyHit.transform.position;
+        //_opponentBodyHit.ClosestPointOnBounds(transform.position);
+        //_opponentImpactPoint = _opponentBodyHit.transform.position;
     }
 
     void BodyPunch()

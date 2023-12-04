@@ -330,7 +330,11 @@ public class PlayerOneMovement : MonoBehaviour
 
         _playerAudioSource.PlayOneShot(_playerBodyHitAudio);
 
-        Vector3 _impactPoint = PlayerPunchLow._opponentImpactPoint;
+        Vector3 _impactPoint = new Vector3(
+             transform.position.x - _playerController.radius / 1.25f,
+             transform.position.y + _playerController.height / 6,
+             transform.position.z - 0.6f
+             );
 
         GameObject _he = Instantiate(_hitEffect,
             //_impactPoint,
@@ -345,7 +349,11 @@ public class PlayerOneMovement : MonoBehaviour
 
         _playerAudioSource.PlayOneShot(_playerHeadHitAudio);
 
-        Vector3 _impactPoint = OpponentPunchHigh._playerImpactPoint;
+        Vector3 _impactPoint = new Vector3(
+             transform.position.x - _playerController.radius / 1.25f,
+             transform.position.y + _playerController.height / 6,
+             transform.position.z - 0.6f
+             );
 
         GameObject _he = Instantiate(_hitEffect,
             //_impactPoint,
@@ -360,7 +368,11 @@ public class PlayerOneMovement : MonoBehaviour
 
         _playerAudioSource.PlayOneShot(_playerBodyHitAudio);
 
-        Vector3 _impactPoint = OpponentKickLow._playerImpactPoint;
+        Vector3 _impactPoint = new Vector3(
+             transform.position.x - _playerController.radius / 1.25f,
+             transform.position.y + _playerController.height / 6,
+             transform.position.z - 0.6f
+             );
 
         GameObject _he = Instantiate(_hitEffect,
             //_impactPoint,
@@ -375,7 +387,11 @@ public class PlayerOneMovement : MonoBehaviour
 
         _playerAudioSource.PlayOneShot(_playerHeadHitAudio);
 
-        Vector3 _impactPoint = OpponentKickHigh._playerImpactPoint;
+        Vector3 _impactPoint = new Vector3(
+             transform.position.x - _playerController.radius / 1.25f,
+             transform.position.y + _playerController.height / 6,
+             transform.position.z - 0.6f
+             );
 
         GameObject _he = Instantiate(_hitEffect,
             //_impactPoint,
