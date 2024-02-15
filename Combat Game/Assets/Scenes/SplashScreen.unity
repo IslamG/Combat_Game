@@ -357,8 +357,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f91380b8b54e25a4ba3b96e461f3b4fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _opponentPosition: {x: 3.66, y: -0.3, z: -6}
-  _opponentRotation: {x: 0, y: 180, z: 0}
   _currentOpponent: {fileID: 0}
   _selectedOpponent: 
   _opponentCounter: 0

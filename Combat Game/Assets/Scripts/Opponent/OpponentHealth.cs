@@ -63,6 +63,18 @@ public class OpponentHealth : MonoBehaviour
 
         CheckHealth();
     }
+    public void OpponentSP1Damage(int _damageDealt, bool headHit)
+    {
+        if (_isOpponentDefeated)
+            return;
+        _currentOpponentHealth -= _damageDealt;
+
+        var hit = headHit ? "OpponentHitBySP1Head" : "OpponentHitBySP1Body";
+
+        SendMessageUpwards(hit, SendMessageOptions.DontRequireReceiver);
+
+        CheckHealth();
+    }
 
     private void CheckHealth()
     {

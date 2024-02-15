@@ -9,6 +9,9 @@ public class PlayerOneMovement : MonoBehaviour
     [SerializeField]
     private CharacterController _playerController;
 
+    private float _playerControllersHeight;
+    private float _playerControllersRadius;
+
     public static GameObject _playerOne;
     public static GameObject _opponent;
 
@@ -20,7 +23,7 @@ public class PlayerOneMovement : MonoBehaviour
     private int _alternativeRotation = 0;
     public float _rotationSpeed = 5f;
 
-    public static bool _isPlayerPunchingLow; 
+    public static bool _isPlayerPunchingLow;
     public static bool _isPlayerPunchingHigh;
     public static bool _isPlayerKickingLow;
     public static bool _isPlayerKickingHigh;
@@ -30,7 +33,11 @@ public class PlayerOneMovement : MonoBehaviour
     public float _playerJumpHeight = 0.5f;
     public float _playerJumpSpeed = 1f;
     public float _playerJumpHorizontal = 1f;
-    private Vector3 _jumpHeightTemp; 
+    private Vector3 _jumpHeightTemp;
+
+    public static bool _specialMoveOneActive;
+    public static bool _specialMoveTwoActive;
+    public static bool _specialMoveThreeActive;
 
     public float _controllerDeadZonePos = 0.1f;
     public float _controllerDeadZoneNeg = -0.1f;
@@ -57,6 +64,12 @@ public class PlayerOneMovement : MonoBehaviour
     public AnimationClip[] _playerAttackAnim;
     public AnimationClip _playerDefeatedClip;
 
+    public AnimationClip _playerSpecialMoveOneClip;
+    public AnimationClip _playerSpecialMoveTwoClip;
+    public AnimationClip _playerSpecialMoveThreeClip;
+
+    private GameObject _specialMove1Projectile; 
+
     private AudioSource _playerAudioSource;
     public AudioClip _playerHeadHitAudio;
     public AudioClip _playerBodyHitAudio;
@@ -66,7 +79,7 @@ public class PlayerOneMovement : MonoBehaviour
     private bool _returnDemoState;
     private int _demoRotationValue = 500;
 
-    private bool _fightIntroFinished; 
+    private bool _fightIntroFinished;
 
     private Vector3 _playerOneMoveDirection = Vector3.zero;
     private CollisionFlags _collisionFlags;
@@ -75,12 +88,13 @@ public class PlayerOneMovement : MonoBehaviour
 
     public enum PlayerOneStates
     {
-        PlayerOneIdle, PlayerWalkLeft, PlayerWalkRight, 
+        PlayerOneIdle, PlayerWalkLeft, PlayerWalkRight,
         PlayerJump, PlayerJumpForwards, PlayerJumpBackwards,
         PlayerComeDown, PlayerComeDownForwards, PlayerComeDownBackwards,
         PlayerHighPunch, PlayerLowPunch, PlayerHighKick, PlayerLowKick,
+        SpecialMoveOne, SpecialMoveTwo, SpecialMoveThree,
         PlayerHitByHighPunch, PlayerHitByLowPunch, PlayerHitByHighKick, PlayerHitByLowKick,
-        WaitForAnimations, WaitForStrikeAnimations,
+        WaitForAnimations, WaitForSpecialMoveAnimations, WaitForStrikeAnimations,
         PlayerDemo, PlayerDefeated
     }
     private IEnumerator PlayerOneFSM()
@@ -98,6 +112,9 @@ public class PlayerOneMovement : MonoBehaviour
                 case PlayerOneStates.PlayerComeDown: PlayerComeDown(); break;
                 case PlayerOneStates.PlayerComeDownForwards: PlayeComeDownForwards(); break;
                 case PlayerOneStates.PlayerComeDownBackwards: PlayerComeDownBackwards(); break;
+                case PlayerOneStates.SpecialMoveOne: SpecialMoveOne(); break;
+                case PlayerOneStates.SpecialMoveTwo: SpecialMoveTwo(); break;
+                case PlayerOneStates.SpecialMoveThree: SpecialMoveThree(); break;
                 case PlayerOneStates.PlayerHighPunch: PlayerHighPunch(); break;
                 case PlayerOneStates.PlayerLowPunch: PlayerLowPunch(); break;
                 case PlayerOneStates.PlayerHighKick: PlayerHighKick(); break;
@@ -107,6 +124,7 @@ public class PlayerOneMovement : MonoBehaviour
                 case PlayerOneStates.PlayerHitByLowKick: PlayerHitByLowKick(); break;
                 case PlayerOneStates.PlayerHitByHighKick: PlayerHitByHighKick(); break;
                 case PlayerOneStates.WaitForAnimations: WaitForAnimations(); break;
+                case PlayerOneStates.WaitForSpecialMoveAnimations: WaitForSpecialMoveAnimations(); break;
                 case PlayerOneStates.WaitForStrikeAnimations: WaitForStrikeAnimations(); break;
                 case PlayerOneStates.PlayerDemo: PlayerDemo(); break;
                 case PlayerOneStates.PlayerDefeated: PlayerDefeated(); break;
@@ -123,26 +141,32 @@ public class PlayerOneMovement : MonoBehaviour
         _jumpHeightTemp = new Vector3(0, _playerJumpHeight, 0);
         _playerSpeedYAxis = 0;
 
-        //_playerController = GetComponent<CharacterController>();
+        _playerController = GetComponent<CharacterController>();
+        _playerControllersHeight = _playerController.height;
+        _playerControllersRadius = _playerController.radius;
 
-         _playerOneAnim = GetComponent<Animation>();
-         _playerAudioSource = GetComponent<AudioSource>();
+        _playerOneAnim = GetComponent<Animation>();
+        _playerAudioSource = GetComponent<AudioSource>();
 
-        for(int a = 0; a < _playerAttackAnim.Length; a++)
+        for (int a = 0; a < _playerAttackAnim.Length; a++)
         {
             _playerOneAnim[_playerAttackAnim[a].name].wrapMode = WrapMode.Once;
         }
 
-        _isPlayerPunchingLow= false;
-        _isPlayerPunchingHigh= false;
+        _isPlayerPunchingLow = false;
+        _isPlayerPunchingHigh = false;
         _isPlayerKickingLow = false;
         _isPlayerKickingHigh = false;
+
+        _specialMoveOneActive = false;
+        _specialMoveTwoActive = false;
+        _specialMoveThreeActive = false;
 
         StartCoroutine("PlayerOneFSM");
 
         _returnDemoState = false;
         _returnDemoState = ChooseCharacter._demoPlayer;
-        if(_returnDemoState )
+        if (_returnDemoState)
         {
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerDemo;
         }
@@ -160,7 +184,7 @@ public class PlayerOneMovement : MonoBehaviour
 
         _fightIntroFinished = FightIntro._fightIntroFinished;
 
-        if (!_fightIntroFinished) 
+        if (!_fightIntroFinished)
             return;
 
         if (PlayerIsGrounded())
@@ -194,7 +218,7 @@ public class PlayerOneMovement : MonoBehaviour
     {
         PlayerRetreatAnim();
 
-        _playerOneMoveDirection = new Vector3(+ _playerWalkSpeed, 0, 0);
+        _playerOneMoveDirection = new Vector3(+_playerWalkSpeed, 0, 0);
         _playerOneMoveDirection = _playerOneTransform.TransformDirection(_playerOneMoveDirection).normalized;
         _playerOneMoveDirection *= _playerWalkSpeed;
 
@@ -209,7 +233,7 @@ public class PlayerOneMovement : MonoBehaviour
     {
         PlayerWalkAnim();
 
-        _playerOneMoveDirection = new Vector3(- _playerWalkSpeed, 0, 0);
+        _playerOneMoveDirection = new Vector3(-_playerWalkSpeed, 0, 0);
         _playerOneMoveDirection = _playerOneTransform.TransformDirection(_playerOneMoveDirection).normalized;
         _playerOneMoveDirection *= _playerWalkSpeed;
 
@@ -260,7 +284,7 @@ public class PlayerOneMovement : MonoBehaviour
         _playerOneMoveDirection *= _playerJumpSpeed;
 
         _collisionFlags = _playerController.Move(_playerOneMoveDirection * Time.deltaTime);
-        
+
         if (_playerOneTransform.transform.position.y >= _jumpHeightTemp.y)
         {
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerComeDownBackwards;
@@ -273,7 +297,7 @@ public class PlayerOneMovement : MonoBehaviour
 
         _collisionFlags = _playerController.Move(_playerOneMoveDirection * Time.deltaTime);
 
-        if(PlayerIsGrounded())
+        if (PlayerIsGrounded())
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerOneIdle;
     }
     private void PlayeComeDownForwards()
@@ -295,6 +319,21 @@ public class PlayerOneMovement : MonoBehaviour
 
         if (PlayerIsGrounded())
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerOneIdle;
+    }
+    public void SpecialMoveOne()
+    {
+        SpecialMoveOneAnim();
+        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForSpecialMoveAnimations;
+    }
+    public void SpecialMoveTwo()
+    {
+        SpecialMoveTwoAnim();
+        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForSpecialMoveAnimations;
+    }
+    public void SpecialMoveThree()
+    {
+        SpecialMoveThreeAnim();
+        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForSpecialMoveAnimations;
     }
     private void PlayerHighPunch()
     {
@@ -402,7 +441,7 @@ public class PlayerOneMovement : MonoBehaviour
     }
     private void WaitForStrikeAnimations()
     {
-        for(int a = 0; a < _playerAttackAnim.Length; a++)
+        for (int a = 0; a < _playerAttackAnim.Length; a++)
         {
             if (_playerOneAnim.IsPlaying(_playerAttackAnim[a].name))
                 return;
@@ -413,7 +452,7 @@ public class PlayerOneMovement : MonoBehaviour
         _isPlayerKickingLow = false;
         _isPlayerKickingHigh = false;
 
-        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForStrikeAnimations; 
+        _playerOneStates = PlayerOneMovement.PlayerOneStates.WaitForStrikeAnimations;
     }
     private void WaitForAnimations()
     {
@@ -424,13 +463,43 @@ public class PlayerOneMovement : MonoBehaviour
 
         _playerOneStates = PlayerOneStates.PlayerOneIdle;
     }
+    private void WaitForSpecialMoveAnimations()
+    {
+        if (_playerOneAnim[_playerSpecialMoveOneClip.name].time >= 0.5f)
+        {
+            if (_specialMove1Projectile != null)
+                return;
+            else
+            {
+                _specialMove1Projectile = Instantiate(Resources.Load("SP1", typeof(GameObject))) as GameObject;
+                int direction = 1;
+
+                //if (_playerPosition.x < _opponentPosition.x)
+                //    direction = 1;
+
+                if (_playerPosition.x > _opponentPosition.x)
+                    direction = -1;
+
+                _specialMove1Projectile.transform.position = new Vector3(
+                    transform.position.x + ((_playerControllersRadius * 3) * direction),
+                    transform.position.y + (_playerControllersHeight / 1.5f),
+                    transform.position.z);
+            }
+        }
+
+        if (_playerOneAnim.IsPlaying(_playerSpecialMoveOneClip.name))
+            return;
+        _specialMoveOneActive = false;
+
+        _playerOneStates = PlayerOneStates.PlayerOneIdle;
+    }
     private void PlayerDemo()
     {
         PlayerDemoAnim();
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0f)//(Input.GetButtonDown("LeftTrigger")) //Horizontal//LeftTrigger
         {
-            transform.Rotate(Vector3.up *_demoRotationValue * Time.deltaTime);
+            transform.Rotate(Vector3.up * _demoRotationValue * Time.deltaTime);
         }
 
         if (Input.GetAxis("Mouse ScrollWheel") < 0f)//(Input.GetButtonDown("RightTrigger")) //Horizontal//LeftTrigger
@@ -456,8 +525,8 @@ public class PlayerOneMovement : MonoBehaviour
     #region Animation methods
     private void PlayerOneIdleAnim()
     {
-       // Debug.Log(_playerOneIdleClip + " " + _playerOneIdleClip.name);
-        _playerOneAnim.CrossFade(_playerOneIdleClip.name); 
+        // Debug.Log(_playerOneIdleClip + " " + _playerOneIdleClip.name);
+        _playerOneAnim.CrossFade(_playerOneIdleClip.name);
     }
     private void PlayerWalkAnim()
     {
@@ -483,6 +552,18 @@ public class PlayerOneMovement : MonoBehaviour
     private void PlayerJumpAnim()
     {
         _playerOneAnim.CrossFade(_playerJumpClip.name);
+    }
+    private void SpecialMoveOneAnim()
+    {
+        _playerOneAnim.CrossFade(_playerSpecialMoveOneClip.name);
+    }
+    private void SpecialMoveTwoAnim()
+    {
+        _playerOneAnim.CrossFade(_playerSpecialMoveTwoClip.name);
+    }
+    private void SpecialMoveThreeAnim()
+    {
+        _playerOneAnim.CrossFade(_playerSpecialMoveThreeClip.name);
     }
     private void PlayerHighPunchAnim()
     {
@@ -528,6 +609,11 @@ public class PlayerOneMovement : MonoBehaviour
     }
     private void AttackInputManager()
     {
+        if (_specialMoveOneActive || _specialMoveTwoActive || _specialMoveThreeActive)
+        {
+            return;
+        }
+
         if (Input.GetButtonDown("Fire1"))
             _playerOneStates = PlayerOneMovement.PlayerOneStates.PlayerHighPunch;
         if (Input.GetButtonDown("Fire2"))
@@ -539,6 +625,11 @@ public class PlayerOneMovement : MonoBehaviour
     }
     private void HorizontalJumpInputManager()
     {
+        if (_specialMoveOneActive || _specialMoveTwoActive || _specialMoveThreeActive)
+        {
+            return;
+        }
+
         if (Input.GetAxis("Vertical") > _controllerDeadZonePos &&
             Input.GetAxis("Horizontal") > 0)
         {
@@ -562,8 +653,10 @@ public class PlayerOneMovement : MonoBehaviour
     }
     private void StandardInputManager()
     {
-        //Debug.Log("Input H " + Input.GetAxis("Horizontal"));
-        //Debug.Log("Input V " + Input.GetAxis("Vertical"));
+        if (_specialMoveOneActive || _specialMoveTwoActive || _specialMoveThreeActive)
+        {
+            return;
+        }
 
         if (Input.GetAxis("Horizontal") <  _controllerDeadZoneNeg)
         {

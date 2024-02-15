@@ -42,6 +42,8 @@ public class OpponentAI : MonoBehaviour
     private AudioSource _opponentAIAudioSource;
     public AudioClip _opponentHeadHitAudio;
     public AudioClip _opponentBodyHitAudio;
+    public AudioClip _opponentHeadSP1HitAudio;
+    public AudioClip _opponentBodySP1HitAudio;
 
     public GameObject _hitEffect;
 
@@ -97,6 +99,7 @@ public class OpponentAI : MonoBehaviour
         JumpUp, JumpTowardsPlayer, JumpAwayFromPlayer,
         ComeDown, ComeDownForward, ComeDownBackwards,
         OpponentHitByLowPunch, OpponentHitByHighPunch, OpponentHitByLowKick, OpponentHitByHighKick,
+        OpponentHitBySP1Head, OpponentHitBySP1Body,
         OpponentLowPunch, OpponentHighPunch, OpponentLowKick, OpponentHighKick,
         ChooseAttackState, 
         WaitForAnimations, WaitForStrikeAnimations, 
@@ -128,6 +131,8 @@ public class OpponentAI : MonoBehaviour
                 case OpponentAIState.OpponentHitByHighPunch: OpponentHitByHighPunch(); break;
                 case OpponentAIState.OpponentHitByLowKick: OpponentHitByLowKick(); break;
                 case OpponentAIState.OpponentHitByHighKick: OpponentHitByHighKick(); break;
+                case OpponentAIState.OpponentHitBySP1Body: OpponentHitBySP1Body(); break;
+                case OpponentAIState.OpponentHitBySP1Head: OpponentHitBySP1Head(); break;
                 case OpponentAIState.OpponentLowPunch: OpponentLowPunch(); break;
                 case OpponentAIState.OpponentHighPunch: OpponentHighPunch(); break;
                 case OpponentAIState.OpponentLowKick: OpponentLowKick(); break;
@@ -311,6 +316,26 @@ public class OpponentAI : MonoBehaviour
             _impactPoint,
             //new Vector3(_impactPoint.x - 0.6f, _impactPoint.y * -1.5f, _impactPoint.z - 0.6f),
             Quaternion.identity) as GameObject;
+
+        _opponentAIState = OpponentAIState.WaitForAnimations;
+    }
+    private void OpponentHitBySP1Body()
+    {
+        OpponentHitBodyAnim();
+
+        _opponentAIAudioSource.PlayOneShot(_opponentBodySP1HitAudio);
+
+        
+
+        _opponentAIState = OpponentAIState.WaitForAnimations;
+    }
+    private void OpponentHitBySP1Head()
+    {
+        OpponentHitBodyAnim();
+
+        _opponentAIAudioSource.PlayOneShot(_opponentHeadSP1HitAudio);
+
+        
 
         _opponentAIState = OpponentAIState.WaitForAnimations;
     }
